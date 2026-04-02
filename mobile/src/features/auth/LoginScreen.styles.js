@@ -105,6 +105,7 @@ const styles = StyleSheet.create({
     height: 24,
   },
   footer: {
+    marginTop: '40%',
     textAlign: 'center',
     color: '#555',
   },

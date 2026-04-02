@@ -5,8 +5,8 @@ export default StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
-    paddingTop: 50,
-    paddingBottom: 30,
+    paddingTop: '15%',
+    paddingBottom: '10%',
   },
 
   slide: {
@@ -16,32 +16,36 @@ export default StyleSheet.create({
   },
 
   imageWrapper: {
-    height: 260,
-    width: 280,
+    marginTop: '40%',
+    height: 270,
+    width: 310,
+    alignSelf: 'center',
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#2F2B2B',
     borderRadius: 30,
     marginBottom: 20,
+    overflow: 'visible',
 
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 20 },
-    shadowOpacity: 0.4,
-    shadowRadius: 25,
-    elevation: 15,
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.3,
+    shadowRadius: 15,
+    elevation: 10,
   },
 
   image: {
-    width: width * 0.75,
-    height: width * 0.75,
-    marginTop: -40,
+    width: 260,
+    height: 260,
+    marginTop: 50,
+    borderRadius: 20,
   },
 
   title: {
     fontSize: 26,
     fontWeight: 'bold',
     textAlign: 'center',
-    marginTop: -20,
+    marginTop: 10,
   },
 
   description: {

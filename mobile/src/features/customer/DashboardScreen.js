@@ -1,5 +1,4 @@
-// src/screens/customer/DashboardScreen.js
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -9,16 +8,53 @@ import {
   Image,
 } from 'react-native';
 import { Ionicons, MaterialIcons, Feather } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
+
 import styles from './DashboardScreen.styles';
+import { auth, db } from '../../services/firebase';
+import { doc, getDoc } from 'firebase/firestore';
+import { onAuthStateChanged } from 'firebase/auth';
+
+import BottomNav from '../../components/BottomNav';
 
 export default function DashboardScreen() {
+  const router = useRouter();
+
+  const [fullName, setFullName] = useState('');
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        try {
+          const docRef = doc(db, 'users', user.uid);
+          const docSnap = await getDoc(docRef);
+
+          if (docSnap.exists()) {
+            const data = docSnap.data();
+
+            // ✅ SAFE fallback if fields missing
+            const firstName = data.firstName || '';
+            const lastName = data.lastName || '';
+
+            setFullName(`${firstName} ${lastName}`.trim());
+          }
+        } catch (error) {
+          console.log('Error fetching user:', error);
+        }
+      }
+    });
+
+    return unsubscribe;
+  }, []);
   return (
     <View style={styles.container}>
       
       {/* HEADER */}
       <View style={styles.header}>
         <View style={styles.headerTop}>
-          <Text style={styles.greeting}>Hello, John Doe</Text>
+          <Text style={styles.greeting}>
+            Hello, {fullName ? fullName : 'User'}
+          </Text>
 
           <View style={styles.notificationWrapper}>
             <Ionicons name="notifications-outline" size={22} color="#000" />
@@ -106,16 +142,8 @@ export default function DashboardScreen() {
 
       </ScrollView>
 
-      {/* BOTTOM NAV */}
-      <View style={styles.bottomNav}>
-        <View style={styles.navItemActive}>
-          <Ionicons name="home" size={22} color="#fff" />
-        </View>
-
-        <Ionicons name="search" size={22} />
-        <Ionicons name="chatbubble-outline" size={22} />
-        <Ionicons name="person-outline" size={22} />
-      </View>
+  {/* ✅ NEW PROFESSIONAL BOTTOM NAV */}
+  <BottomNav active="home" />
 
     </View>
   );

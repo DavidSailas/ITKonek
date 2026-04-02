@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { View, Text, Image } from 'react-native';
 import styles from './LogoScreen.styles';
 import { useRouter } from 'expo-router';
@@ -19,7 +19,15 @@ export default function LogoScreen() {
   const textOpacity = useSharedValue(0);
   const textTranslateY = useSharedValue(20);
 
-  useEffect(() => {
+  // refs to keep track of timers and to avoid starting animation twice
+  const navTimerRef = useRef(null);
+  const textTimerRef = useRef(null);
+  const startedRef = useRef(false);
+
+  // Start the animation sequence only after the image has finished loading.
+  const startAnimations = () => {
+    if (startedRef.current) return;
+    startedRef.current = true;
 
     logoScale.value = withTiming(1, {
       duration: 900,
@@ -30,7 +38,7 @@ export default function LogoScreen() {
       duration: 800,
     });
 
-    setTimeout(() => {
+    textTimerRef.current = setTimeout(() => {
       textOpacity.value = withTiming(1, { duration: 800 });
       textTranslateY.value = withTiming(0, {
         duration: 800,
@@ -38,12 +46,10 @@ export default function LogoScreen() {
       });
     }, 400);
 
-    const timer = setTimeout(() => {
-      router.replace('/onboarding1/page');
+    navTimerRef.current = setTimeout(() => {
+      router.replace('/onboarding/page');
     }, 2500);
-
-    return () => clearTimeout(timer);
-  }, []);
+  };
 
   const logoAnimatedStyle = useAnimatedStyle(() => ({
     transform: [{ scale: logoScale.value }],
@@ -55,18 +61,36 @@ export default function LogoScreen() {
     transform: [{ translateY: textTranslateY.value }],
   }));
 
+  const screenOpacity = useSharedValue(0);
+
+  useEffect(() => {
+    screenOpacity.value = withTiming(1, { duration: 500 });
+  }, []);
+
+  const screenStyle = useAnimatedStyle(() => ({
+    opacity: screenOpacity.value,
+  }));
+
+  useEffect(() => {
+    return () => {
+      if (navTimerRef.current) clearTimeout(navTimerRef.current);
+      if (textTimerRef.current) clearTimeout(textTimerRef.current);
+    };
+  }, []);
+
   return (
-    <View style={styles.container}>
+    <Animated.View style={[styles.container, screenStyle]}>
       <Animated.Image
         source={require('../../assets/logo/logo.png')}
         style={[styles.logo, logoAnimatedStyle]}
         resizeMode="contain"
+        onLoad={startAnimations}
       />
 
       <Animated.View style={textAnimatedStyle}>
         <Text style={styles.title}>ITKonek</Text>
         <Text style={styles.tagline}>By JMS One IT</Text>
       </Animated.View>
-    </View>
+    </Animated.View>
   );
 }

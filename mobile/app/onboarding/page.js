@@ -1,5 +1,6 @@
 import React, { useRef, useState } from 'react';
-import { View, FlatList, TouchableOpacity, Text, Animated, Dimensions } from 'react-native';
+import { View, FlatList, TouchableOpacity, Text, Dimensions } from 'react-native';
+import Animated, { useSharedValue, useAnimatedScrollHandler } from 'react-native-reanimated';
 import { useRouter } from 'expo-router';
 
 import { slides } from '../../src/features/onboarding/onboardingData';
@@ -12,7 +13,10 @@ const { width } = Dimensions.get('window');
 export default function OnboardingScreen() {
   const router = useRouter();
   const flatListRef = useRef();
-  const scrollX = useRef(new Animated.Value(0)).current;
+  const scrollX = useSharedValue(0);
+  const scrollHandler = useAnimatedScrollHandler((event) => {
+    scrollX.value = event.contentOffset.x;
+  });
   const [currentIndex, setCurrentIndex] = useState(0);
 
   const handleNext = () => {
@@ -36,15 +40,13 @@ export default function OnboardingScreen() {
       <Animated.FlatList
         ref={flatListRef}
         data={slides}
-        renderItem={({ item }) => <SlideItem item={item} />}
+        renderItem={({ item, index }) => <SlideItem item={item} index={index} scrollX={scrollX} />}
         horizontal
         pagingEnabled
         showsHorizontalScrollIndicator={false}
         keyExtractor={(item) => item.id.toString()}
-        onScroll={Animated.event(
-          [{ nativeEvent: { contentOffset: { x: scrollX } } }],
-          { useNativeDriver: false }
-        )}
+        onScroll={scrollHandler}
+        scrollEventThrottle={16}
         onMomentumScrollEnd={(e) => {
           const index = Math.round(e.nativeEvent.contentOffset.x / width);
           setCurrentIndex(index);

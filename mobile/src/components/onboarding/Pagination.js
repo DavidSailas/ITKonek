@@ -1,6 +1,6 @@
 import React from 'react';
-import { View, Animated } from 'react-native';
-import styles from '../../features/onboarding/onboarding.styles';
+import { View, StyleSheet } from 'react-native';
+import Animated, { useAnimatedStyle, interpolate } from 'react-native-reanimated';
 
 export default function Pagination({ data, scrollX, width }) {
   return (
@@ -8,25 +8,31 @@ export default function Pagination({ data, scrollX, width }) {
       {data.map((_, i) => {
         const inputRange = [(i - 1) * width, i * width, (i + 1) * width];
 
-        const widthAnim = scrollX.interpolate({
-          inputRange,
-          outputRange: [10, 20, 10],
-          extrapolate: 'clamp',
+        const animatedStyle = useAnimatedStyle(() => {
+          const w = interpolate(scrollX.value, inputRange, [10, 20, 10]);
+          const o = interpolate(scrollX.value, inputRange, [0.3, 1, 0.3]);
+          return {
+            width: w,
+            opacity: o,
+          };
         });
 
-        const opacityAnim = scrollX.interpolate({
-          inputRange,
-          outputRange: [0.3, 1, 0.3],
-          extrapolate: 'clamp',
-        });
-
-        return (
-          <Animated.View
-            key={i}
-            style={[styles.dot, { width: widthAnim, opacity: opacityAnim }]}
-          />
-        );
+        return <Animated.View key={i.toString()} style={[styles.dot, animatedStyle]} />;
       })}
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  pagination: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginTop: 20,
+  },
+  dot: {
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: '#000',
+    marginHorizontal: 5,
+  },
+});

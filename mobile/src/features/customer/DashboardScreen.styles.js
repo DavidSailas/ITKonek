@@ -10,7 +10,7 @@ const styles = StyleSheet.create({
   header: {
     backgroundColor: '#111',
     padding: 20,
-    paddingTop: 50,
+    paddingTop: 60,
     borderBottomLeftRadius: 30,
     borderBottomRightRadius: 30,
   },
@@ -27,14 +27,14 @@ const styles = StyleSheet.create({
   notificationWrapper: {
     backgroundColor: '#fff',
     padding: 10,
-    borderRadius: 50,
+    borderRadius: 10,
   },
   notificationDot: {
     position: 'absolute',
-    top: 5,
-    right: 5,
-    width: 8,
-    height: 8,
+    top: 11,
+    right: 13,
+    width: 7,
+    height: 7,
     backgroundColor: 'red',
     borderRadius: 5,
   },
@@ -64,7 +64,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#222',
     borderRadius: 20,
     padding: 20,
-    marginTop: -40,
     marginBottom: 20,
   },
   serviceLabel: {
@@ -167,19 +166,6 @@ const styles = StyleSheet.create({
     height: 120,
     backgroundColor: '#ddd',
     borderRadius: 15,
-  },
-
-  /* BOTTOM NAV */
-  bottomNav: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    padding: 15,
-    backgroundColor: '#fff',
-  },
-  navItemActive: {
-    backgroundColor: '#000',
-    padding: 10,
-    borderRadius: 50,
   },
 });
 

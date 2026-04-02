@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -9,12 +9,13 @@ import {
   Alert,
 } from 'react-native';
 import { Ionicons, MaterialIcons, FontAwesome } from '@expo/vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter } from 'expo-router';
 import styles from './LoginScreen.styles';
 
-import { auth, db } from '../../services/firebase';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { doc, getDoc } from 'firebase/firestore';
+import { auth, db } from '../../services/firebase';
 
 export default function LoginScreen() {
   const router = useRouter();
@@ -23,6 +24,22 @@ export default function LoginScreen() {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState({ email: '', password: '' });
+  const [rememberMe, setRememberMe] = useState(false);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const saved = await AsyncStorage.getItem('@remembered_email');
+        const flag = await AsyncStorage.getItem('@remember_me');
+        if (flag === 'true') {
+          setRememberMe(true);
+          if (saved) setEmail(saved);
+        }
+      } catch (e) {
+        console.warn('Remember me load error', e);
+      }
+    })();
+  }, []);
 
   const handleLogin = async () => {
     let tempError = { email: '', password: '' };
@@ -56,9 +73,32 @@ export default function LoginScreen() {
       // CHECK ROLE
       if (userData.role === 'customer') {
         console.log('navigating to customer home');
+        // persist remembered email if requested
+        try {
+          if (rememberMe) {
+            await AsyncStorage.setItem('@remembered_email', email);
+            await AsyncStorage.setItem('@remember_me', 'true');
+          } else {
+            await AsyncStorage.removeItem('@remembered_email');
+            await AsyncStorage.setItem('@remember_me', 'false');
+          }
+        } catch (e) {
+          console.warn('Remember me save error', e);
+        }
         router.replace('/home/page');
       } else if (userData.role === 'engineer') {
         console.log('navigating to engineer home');
+        try {
+          if (rememberMe) {
+            await AsyncStorage.setItem('@remembered_email', email);
+            await AsyncStorage.setItem('@remember_me', 'true');
+          } else {
+            await AsyncStorage.removeItem('@remembered_email');
+            await AsyncStorage.setItem('@remember_me', 'false');
+          }
+        } catch (e) {
+          console.warn('Remember me save error', e);
+        }
         router.replace('/engineer-home/page');
       } else {
         Alert.alert('Error', 'Unauthorized role: ' + (userData.role || 'unknown'));
@@ -85,7 +125,12 @@ export default function LoginScreen() {
     >
       {/* HEADER */}
       <View style={styles.header}>
-        <FontAwesome name="user-circle" size={40} color="#fff" />
+        <Image
+          source={require('../../assets/logo/logo.png')}
+          style={{ width: 72, height: 72, marginBottom: 12, alignSelf: 'center', tintColor: '#fff' }}
+          resizeMode="contain"
+          accessibilityLabel="ITKonek logo"
+        />
         <Text style={styles.title}>Log in to your Account</Text>
         <Text style={styles.subtitle}>All IT services in one place</Text>
       </View>
@@ -122,9 +167,31 @@ export default function LoginScreen() {
         </View>
 
         {/* CONTROLS */}
-        <View style={styles.controls}>
-          <Text style={styles.remember}>Remember me</Text>
-          <Text style={styles.forgot}>Forgot Password?</Text>
+        <View style={[styles.controls, { alignItems: 'center' }]}>
+          <TouchableOpacity
+            onPress={async () => {
+              const next = !rememberMe;
+              setRememberMe(next);
+              try {
+                await AsyncStorage.setItem('@remember_me', next ? 'true' : 'false');
+                if (!next) await AsyncStorage.removeItem('@remembered_email');
+              } catch (e) {
+                console.warn('Remember me toggle error', e);
+              }
+            }}
+            style={{ flexDirection: 'row', alignItems: 'center' }}
+            accessibilityRole="checkbox"
+            accessibilityState={{ checked: rememberMe }}
+          >
+            <View style={{ width: 20, height: 20, borderRadius: 4, borderWidth: 1, borderColor: '#ccc', alignItems: 'center', justifyContent: 'center', marginRight: 8, backgroundColor: rememberMe ? '#4285F4' : 'transparent' }}>
+              {rememberMe ? <FontAwesome name="check" size={12} color="#fff" /> : null}
+            </View>
+            <Text style={styles.remember}>Remember me</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity>
+            <Text style={styles.forgot}>Forgot Password?</Text>
+          </TouchableOpacity>
         </View>
 
         {/* LOGIN BUTTON */}
@@ -137,23 +204,26 @@ export default function LoginScreen() {
 
         {/* SOCIALS */}
         <View style={styles.socials}>
-          <TouchableOpacity style={styles.socialBtn}>
-            <Image source={{ uri: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/google/google-original.svg' }} style={styles.socialIcon} />
+          <TouchableOpacity
+            style={[styles.socialBtn, { width: 48, height: 48, borderRadius: 24, alignItems: 'center', justifyContent: 'center', marginHorizontal: 6 }]}
+            accessibilityLabel="Sign in with Google"
+          >
+            <Image source={require('../../assets/images/google.png')} style={{ width: 22, height: 22 }} resizeMode="contain" />
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.socialBtn}>
-            <FontAwesome name="apple" size={24} />
+            <Image source={require('../../assets/images/apple.png')} style={{ width: 22, height: 22 }} resizeMode="contain" />
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.socialBtn}>
-            <FontAwesome name="facebook" size={24} color="#1877f2" />
+            <Image source={require('../../assets/images/facebook.png')} style={{ width: 22, height: 22 }} resizeMode="contain" />
           </TouchableOpacity>
         </View>
 
         {/* FOOTER */}
-        <Text style={styles.footer}>
+          <Text style={styles.footer}>
           Don't have an account?{' '}
-          <Text style={{ fontWeight: 'bold' }}>Sign Up</Text>
+          <Text onPress={() => router.push('/signup/page')} style={{ fontWeight: 'bold' }}>Sign Up</Text>
         </Text>
       </View>
     </ImageBackground>
