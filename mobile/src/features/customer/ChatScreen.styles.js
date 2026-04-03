@@ -1,83 +1,65 @@
-import { StyleSheet, Dimensions } from 'react-native';
-const { width } = Dimensions.get('window');
+import { StyleSheet, Platform, StatusBar } from 'react-native';
 
 export default StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f5f5f5' },
-
-  /* HEADER */
+  container: {
+    flex: 1,
+    backgroundColor: '#FFF',
+  },
   header: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
-    padding: 15,
-    backgroundColor: '#fff',
+    paddingHorizontal: 20,
+    paddingBottom: 15,
+    paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight + 10 : 20,
     borderBottomWidth: 1,
-    borderColor: '#eee',
-    paddingTop: 55,
+    borderColor: '#F0F0F0',
   },
-  headerLeft: { flexDirection: 'row', alignItems: 'center' },
-  avatar: { width: 45, height: 45, borderRadius: 25, marginRight: 10 },
-  engineerName: { fontWeight: 'bold', fontSize: 16 },
-  engineerStatus: { fontSize: 12, color: 'green' },
+  headerInfo: { flex: 1, flexDirection: 'row', alignItems: 'center', marginLeft: 15 },
+  avatar: { width: 40, height: 40, borderRadius: 12, marginRight: 10, backgroundColor: '#EEE' },
+  userName: { fontSize: 16, fontWeight: '800', color: '#111' },
+  statusText: { fontSize: 11, color: '#16A34A', fontWeight: '700' }, 
+  callIcon: { padding: 8, backgroundColor: '#F9F9F9', borderRadius: 20 },
 
-  /* CHAT LIST */
-  chatList: {
+  listPadding: {
+    paddingHorizontal: 20,
+    paddingTop: 20,
+    paddingBottom: 20,
+  },
+  
+  msgWrapper: { marginBottom: 15, maxWidth: '85%' },
+  msgLeft: { alignSelf: 'flex-start' },
+  msgRight: { alignSelf: 'flex-end' },
+  bubble: { padding: 14, borderRadius: 20 },
+  customerBubble: { backgroundColor: '#111', borderBottomRightRadius: 4 },
+  engineerBubble: { backgroundColor: '#F2F2F2', borderBottomLeftRadius: 4 },
+  textWhite: { color: '#FFF', fontSize: 15 },
+  textBlack: { color: '#111', fontSize: 15 },
+  timeText: { fontSize: 10, color: '#AAA', marginTop: 4 },
+
+  /* THE FIX: Standardized Input Area */
+  inputArea: {
     paddingHorizontal: 15,
-    paddingVertical: 10,
+    paddingVertical: 12,
+    backgroundColor: '#FFF',
+    borderTopWidth: 1,
+    borderColor: '#F0F0F0',
   },
-  messageContainer: {
-    maxWidth: width * 0.7,
-    padding: 10,
-    marginVertical: 4,
-    borderRadius: 15,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 2,
+  /* This specific padding replaces the Spacer and prevents the "jump" */
+  inputAreaWithNav: {
+    paddingBottom: Platform.OS === 'android' ? 120 : 90, 
   },
-  customerMessage: {
-    backgroundColor: '#1F1F1F',
-    alignSelf: 'flex-end',
-    borderTopRightRadius: 0,
-  },
-  engineerMessage: {
-    backgroundColor: '#e0e0e0',
-    alignSelf: 'flex-start',
-    borderTopLeftRadius: 0,
-  },
-  messageText: { color: '#fff', fontSize: 14 },
-  messageTime: { fontSize: 10, color: '#ccc', alignSelf: 'flex-end', marginTop: 2 },
-
-  /* INPUT BAR */
-  inputContainer: {
+  searchStyleInput: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 10,
-    marginHorizontal: 10,
-    marginBottom: 5,
-    backgroundColor: '#fff',
-    borderRadius: 30,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 3,
-    elevation: 3,
-  },
-  textInput: {
-    flex: 1,
-    height: 45,
-    paddingHorizontal: 15,
-    borderRadius: 30,
-    backgroundColor: '#f1f1f1',
-  },
-  sendBtn: {
-    backgroundColor: '#1F1F1F',
-    width: 45,
-    height: 45,
+    backgroundColor: '#F5F5F5',
     borderRadius: 25,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginLeft: 8,
+    paddingHorizontal: 15,
+    height: 50,
+  },
+  inputField: {
+    flex: 1,
+    fontSize: 15,
+    color: '#111',
+    paddingVertical: Platform.OS === 'android' ? 10 : 0,
   },
 });

@@ -1,119 +1,239 @@
 import { StyleSheet, Dimensions } from 'react-native';
 
-const { width } = Dimensions.get('window');
+const { width, height } = Dimensions.get('window');
 
 export default StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#fff',
+  },
+  /* MAP STYLES */
+  mapWrapper: {
+    ...StyleSheet.absoluteFillObject,
+  },
+  mapImage: {
+    width: width,
+    height: height,
+  },
+  engineerDot: {
+    position: 'absolute',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  dotPulse: {
+    position: 'absolute',
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: 'rgba(0, 128, 128, 0.2)',
+  },
+  /* USER LOCATION (GREEN) */
+  userLocation: {
+    position: 'absolute',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  userDot: {
+    width: 16,
+    height: 16,
+    borderRadius: 8,
+    backgroundColor: '#2ECC71', // Professional Green
+    borderWidth: 3,
+    borderColor: '#fff',
+    elevation: 5,
+  },
+  userPulse: {
+    position: 'absolute',
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: 'rgba(46, 204, 113, 0.25)',
   },
 
-  /* HEADER */
-  header: {
-    backgroundColor: '#111',
-    padding: 20,
-    paddingTop: 60,
-    borderBottomLeftRadius: 30,
-    borderBottomRightRadius: 30,
+  /* ENGINEER MARKER (PROFESSIONAL TEAL/DARK) */
+  engineerMarkerContainer: {
+    position: 'absolute',
+    alignItems: 'center',
   },
-  headerTitle: {
-    color: '#fff',
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginBottom: 15,
+  markerPin: {
+    backgroundColor: '#004D4D', // Deep Professional Teal
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: '#FFFFFF',
+    elevation: 6,
+    shadowColor: '#000',
+    shadowOpacity: 0.3,
+    shadowRadius: 3,
   },
-  searchBar: {
+  pulseRing: {
+    position: 'absolute',
+    top: 0,
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: 'rgba(0, 77, 77, 0.3)',
+    // In a real app, use Animated API to scale this
+  },
+  markerLabel: {
+    backgroundColor: '#FFFFFF',
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 10,
+    marginTop: 4,
+    borderWidth: 1,
+    borderColor: '#EEE',
+    elevation: 2,
+  },
+  markerLabelText: {
+    fontSize: 10,
+    fontWeight: '700',
+    color: '#333',
+  },
+
+  /* FLOATING SEARCH BAR */
+  overlayHeader: {
+    position: 'absolute',
+    top: 50,
+    width: '100%',
+    paddingHorizontal: 20,
+    zIndex: 10,
+  },
+  searchBarContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#fff',
-    borderRadius: 25,
-    paddingHorizontal: 15,
-    height: 45,
+    borderRadius: 15,
+    height: 55,
+    elevation: 10,
+    shadowColor: '#000',
+    shadowOpacity: 0.2,
+    shadowRadius: 10,
   },
   searchInput: {
-    marginLeft: 10,
     flex: 1,
-    height: '100%',
+    paddingHorizontal: 10,
+    fontSize: 16,
+    color: '#333',
+  },
+  filterBtn: {
+    backgroundColor: '#008080',
+    padding: 10,
+    borderRadius: 10,
+    marginRight: 8,
   },
 
-  /* MAP */
-  mapContainer: {
-  margin: 20,
-  borderRadius: 15,
-  overflow: 'hidden',
-  backgroundColor: '#ddd',
-  height: 200,
-  position: 'relative', // needed for absolute dots
-},
+  /* ZOOM BUTTONS (MATCHING IMAGE) */
+  zoomControls: {
+    position: 'absolute',
+    right: 20,
+    top: height * 0.35,
+    backgroundColor: '#fff',
+    borderRadius: 30,
+    elevation: 5,
+    shadowOpacity: 0.1,
+  },
+  zoomBtn: {
+    width: 50,
+    height: 50,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  zoomSeparator: {
+    borderTopWidth: 1,
+    borderBottomWidth: 1,
+    borderColor: '#eee',
+  },
 
-mapImage: {
-  width: '100%',
-  height: '100%',
-},
-
-engineerDot: {
-  position: 'absolute',
-  width: 14,
-  height: 14,
-  borderRadius: 7,
-  backgroundColor: '#ff0000ff',
-  borderWidth: 2,
-  borderColor: '#fff',
-  shadowColor: '#000',
-  shadowOffset: { width: 0, height: 2 },
-  shadowOpacity: 0.3,
-  shadowRadius: 4,
-  elevation: 3,
-},
-
-  /* SEARCH RESULTS */
-  resultsContainer: {
+/* BOTTOM RESULTS AREA */
+  bottomSheet: {
+    position: 'absolute',
+    bottom: 80, // Above BottomNav
+    width: '100%',
+    maxHeight: height * 0.4, // Limit height so map is still visible
+    backgroundColor: 'rgba(255,255,255,0.98)',
+    borderTopLeftRadius: 30,
+    borderTopRightRadius: 30,
+    paddingTop: 10,
+    elevation: 20,
+    shadowColor: '#000',
+    shadowOpacity: 0.2,
+    shadowRadius: 15,
+  },
+  dragHandle: {
+    width: 40,
+    height: 5,
+    backgroundColor: '#e0e0e0',
+    borderRadius: 3,
+    alignSelf: 'center',
+    marginBottom: 10,
+  },
+  resultsTitle: {
     paddingHorizontal: 20,
-    paddingBottom: 80, // space for bottom nav
+    fontSize: 15,
+    fontWeight: '800',
+    color: '#111',
+    marginBottom: 12,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
+  resultsScroll: {
+    paddingHorizontal: 20,
+    paddingBottom: 20,
   },
   resultCard: {
     backgroundColor: '#fff',
-    borderRadius: 15,
+    width: '100%', // Take full width of container
+    borderRadius: 20,
     padding: 15,
-    marginBottom: 10,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
+    marginBottom: 12, // Space between cards in the column
+    borderWidth: 1,
+    borderColor: '#f0f0f0',
     elevation: 2,
-    justifyContent: 'space-between',
+    shadowOpacity: 0.05,
   },
-  engineerInfo: {
+  cardHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 10,
+    marginBottom: 12,
   },
   avatar: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
+    width: 55,
+    height: 55,
+    borderRadius: 18,
+    backgroundColor: '#f9f9f9',
+  },
+  textGroup: {
+    marginLeft: 15,
+    flex: 1,
   },
   engineerName: {
     fontWeight: 'bold',
-    fontSize: 16,
+    fontSize: 17,
     color: '#111',
   },
   engineerService: {
-    color: '#888',
+    color: '#008080',
     fontSize: 14,
+    fontWeight: '600',
+    marginVertical: 2,
   },
   engineerDistance: {
-    color: '#aaa',
+    color: '#999',
     fontSize: 12,
   },
   bookBtn: {
-    backgroundColor: '#222',
-    paddingVertical: 8,
-    borderRadius: 10,
+    backgroundColor: '#111', // Professional dark button
+    paddingVertical: 12,
+    borderRadius: 12,
     alignItems: 'center',
   },
   bookBtnText: {
     color: '#fff',
     fontWeight: 'bold',
+    fontSize: 14,
   },
 });
