@@ -7,6 +7,10 @@ import {
   Image,
   ImageBackground,
   Alert,
+  KeyboardAvoidingView,
+  Platform,
+  TouchableWithoutFeedback,
+  Keyboard
 } from 'react-native';
 import { Ionicons, MaterialIcons, FontAwesome } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -25,6 +29,7 @@ export default function LoginScreen() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState({ email: '', password: '' });
   const [rememberMe, setRememberMe] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -43,77 +48,43 @@ export default function LoginScreen() {
 
   const handleLogin = async () => {
     let tempError = { email: '', password: '' };
-
     if (!email) tempError.email = 'Email is required';
     else if (!/^\S+@\S+\.\S+$/.test(email)) tempError.email = 'Invalid email format';
-
     if (!password) tempError.password = 'Password is required';
 
     setError(tempError);
     if (tempError.email || tempError.password) return;
 
+    setLoading(true);
     try {
-      // LOGIN
       const userCred = await signInWithEmailAndPassword(auth, email, password);
-      console.log('signIn success', userCred);
-      const uid = userCred.user.uid;
-
-      // GET USER DATA
-      const userSnap = await getDoc(doc(db, 'users', uid));
-      console.log('userSnap exists?', userSnap.exists && userSnap.exists());
+      const userSnap = await getDoc(doc(db, 'users', userCred.user.uid));
 
       if (!userSnap.exists()) {
-        Alert.alert('Error', 'User data not found for UID: ' + uid);
+        Alert.alert('Error', 'User data not found.');
+        setLoading(false);
         return;
       }
 
       const userData = userSnap.data();
-      console.log('User data:', userData);
 
-      // CHECK ROLE
+      if (rememberMe) {
+        await AsyncStorage.setItem('@remembered_email', email);
+        await AsyncStorage.setItem('@remember_me', 'true');
+      } else {
+        await AsyncStorage.removeItem('@remembered_email');
+        await AsyncStorage.setItem('@remember_me', 'false');
+      }
+
       if (userData.role === 'customer') {
-        console.log('navigating to customer home');
-        // persist remembered email if requested
-        try {
-          if (rememberMe) {
-            await AsyncStorage.setItem('@remembered_email', email);
-            await AsyncStorage.setItem('@remember_me', 'true');
-          } else {
-            await AsyncStorage.removeItem('@remembered_email');
-            await AsyncStorage.setItem('@remember_me', 'false');
-          }
-        } catch (e) {
-          console.warn('Remember me save error', e);
-        }
         router.replace('/home/page');
       } else if (userData.role === 'engineer') {
-        console.log('navigating to engineer home');
-        try {
-          if (rememberMe) {
-            await AsyncStorage.setItem('@remembered_email', email);
-            await AsyncStorage.setItem('@remember_me', 'true');
-          } else {
-            await AsyncStorage.removeItem('@remembered_email');
-            await AsyncStorage.setItem('@remember_me', 'false');
-          }
-        } catch (e) {
-          console.warn('Remember me save error', e);
-        }
         router.replace('/engineer-home/page');
-      } else {
-        Alert.alert('Error', 'Unauthorized role: ' + (userData.role || 'unknown'));
       }
     } catch (err) {
-      console.error('Login error', err);
-      const message = err?.message || 'Login failed. Try again.';
-      Alert.alert('Login error', message);
-      if (err?.code === 'auth/user-not-found') {
-        setError({ email: 'No account found with this email', password: '' });
-      } else if (err?.code === 'auth/wrong-password') {
-        setError({ email: 'Incorrect password', password: '' });
-      } else {
-        setError({ email: message, password: '' });
-      }
+      Alert.alert('Login Error', err.message);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -123,109 +94,109 @@ export default function LoginScreen() {
       style={styles.container}
       resizeMode="cover"
     >
-      {/* HEADER */}
-      <View style={styles.header}>
-        <Image
-          source={require('../../assets/logo/logo.png')}
-          style={{ width: 72, height: 72, marginBottom: 12, alignSelf: 'center', tintColor: '#fff' }}
-          resizeMode="contain"
-          accessibilityLabel="ITKonek logo"
-        />
-        <Text style={styles.title}>Log in to your Account</Text>
-        <Text style={styles.subtitle}>All IT services in one place</Text>
-      </View>
-
-      {/* FORM CONTAINER */}
-      <View style={styles.formContainer}>
-        {/* EMAIL */}
-        <View style={styles.group}>
-          <View style={styles.labelRow}>
-            <Text style={styles.label}>Email</Text>
-            {error.email ? <Text style={styles.error}>{error.email}</Text> : null}
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+          style={{ flex: 1 }}
+        >
+          {/* HEADER: Flex 1 allows this area to shrink when keyboard shows */}
+          <View style={styles.header}>
+            <Image
+              source={require('../../assets/logo/logo.png')}
+              style={styles.logo}
+              resizeMode="contain"
+            />
+            <Text style={styles.title}>Log in to your Account</Text>
+            <Text style={styles.subtitle}>All IT services in one place</Text>
           </View>
 
-          <View style={[styles.inputGroup, error.email && styles.errorBorder]}>
-            <MaterialIcons name="email" size={20} color="#888" />
-            <TextInput style={styles.input} placeholder="example@jmsoneit.com" value={email} onChangeText={setEmail} />
-          </View>
-        </View>
-
-        {/* PASSWORD */}
-        <View style={styles.group}>
-          <View style={styles.labelRow}>
-            <Text style={styles.label}>Password</Text>
-            {error.password ? <Text style={styles.error}>{error.password}</Text> : null}
-          </View>
-
-          <View style={[styles.inputGroup, error.password && styles.errorBorder]}>
-            <Ionicons name="lock-closed" size={20} color="#888" />
-            <TextInput style={styles.input} placeholder="Enter your password" secureTextEntry={!showPassword} value={password} onChangeText={setPassword} />
-            <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
-              <Ionicons name={showPassword ? 'eye-off' : 'eye'} size={20} color="#888" />
-            </TouchableOpacity>
-          </View>
-        </View>
-
-        {/* CONTROLS */}
-        <View style={[styles.controls, { alignItems: 'center' }]}>
-          <TouchableOpacity
-            onPress={async () => {
-              const next = !rememberMe;
-              setRememberMe(next);
-              try {
-                await AsyncStorage.setItem('@remember_me', next ? 'true' : 'false');
-                if (!next) await AsyncStorage.removeItem('@remembered_email');
-              } catch (e) {
-                console.warn('Remember me toggle error', e);
-              }
-            }}
-            style={{ flexDirection: 'row', alignItems: 'center' }}
-            accessibilityRole="checkbox"
-            accessibilityState={{ checked: rememberMe }}
-          >
-            <View style={{ width: 20, height: 20, borderRadius: 4, borderWidth: 1, borderColor: '#ccc', alignItems: 'center', justifyContent: 'center', marginRight: 8, backgroundColor: rememberMe ? '#4285F4' : 'transparent' }}>
-              {rememberMe ? <FontAwesome name="check" size={12} color="#fff" /> : null}
+          {/* FORM CONTAINER: No flex 1 here so it keeps its shape */}
+          <View style={styles.formContainer}>
+            
+            <View style={styles.group}>
+              <View style={styles.labelRow}>
+                <Text style={styles.label}>Email</Text>
+                {error.email ? <Text style={styles.error}>{error.email}</Text> : null}
+              </View>
+              <View style={[styles.inputGroup, error.email && styles.errorBorder]}>
+                <MaterialIcons name="email" size={20} color="#888" />
+                <TextInput
+                  style={styles.input}
+                  placeholder="customer@jmsoneit.com"
+                  value={email}
+                  onChangeText={setEmail}
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                  placeholderTextColor="#aaa"
+                />
+              </View>
             </View>
-            <Text style={styles.remember}>Remember me</Text>
-          </TouchableOpacity>
 
-          <TouchableOpacity>
-            <Text style={styles.forgot}>Forgot Password?</Text>
-          </TouchableOpacity>
-        </View>
+            <View style={styles.group}>
+              <View style={styles.labelRow}>
+                <Text style={styles.label}>Password</Text>
+                {error.password ? <Text style={styles.error}>{error.password}</Text> : null}
+              </View>
+              <View style={[styles.inputGroup, error.password && styles.errorBorder]}>
+                <Ionicons name="lock-closed" size={20} color="#888" />
+                <TextInput
+                  style={styles.input}
+                  placeholder="Enter your password"
+                  secureTextEntry={!showPassword}
+                  value={password}
+                  onChangeText={setPassword}
+                  placeholderTextColor="#aaa"
+                />
+                <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
+                  <Ionicons name={showPassword ? 'eye-off' : 'eye'} size={20} color="#888" />
+                </TouchableOpacity>
+              </View>
+            </View>
 
-        {/* LOGIN BUTTON */}
-        <TouchableOpacity style={styles.loginBtn} onPress={handleLogin}>
-          <Text style={styles.loginText}>Log in</Text>
-        </TouchableOpacity>
+            <View style={styles.controls}>
+              <TouchableOpacity
+                onPress={() => setRememberMe(!rememberMe)}
+                style={{ flexDirection: 'row', alignItems: 'center' }}
+              >
+                <View style={[styles.checkbox, rememberMe && styles.checkboxActive]}>
+                  {rememberMe && <FontAwesome name="check" size={10} color="#fff" />}
+                </View>
+                <Text style={styles.remember}>Remember me</Text>
+              </TouchableOpacity>
+              <TouchableOpacity>
+                <Text style={styles.forgot}>Forgot Password?</Text>
+              </TouchableOpacity>
+            </View>
 
-        {/* DIVIDER */}
-        <Text style={styles.divider}>or continue with</Text>
+            <TouchableOpacity
+              style={[styles.loginBtn, loading && { opacity: 0.7 }]}
+              onPress={handleLogin}
+              disabled={loading}
+            >
+              <Text style={styles.loginText}>{loading ? 'Logging in...' : 'Log in'}</Text>
+            </TouchableOpacity>
 
-        {/* SOCIALS */}
-        <View style={styles.socials}>
-          <TouchableOpacity
-            style={[styles.socialBtn, { width: 48, height: 48, borderRadius: 24, alignItems: 'center', justifyContent: 'center', marginHorizontal: 6 }]}
-            accessibilityLabel="Sign in with Google"
-          >
-            <Image source={require('../../assets/images/google.png')} style={{ width: 22, height: 22 }} resizeMode="contain" />
-          </TouchableOpacity>
+            <Text style={styles.divider}>or continue with</Text>
 
-          <TouchableOpacity style={styles.socialBtn}>
-            <Image source={require('../../assets/images/apple.png')} style={{ width: 22, height: 22 }} resizeMode="contain" />
-          </TouchableOpacity>
+            <View style={styles.socials}>
+              <TouchableOpacity style={styles.socialBtn}>
+                <Image source={require('../../assets/images/google.png')} style={styles.socialIcon} />
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.socialBtn}>
+                <Image source={require('../../assets/images/apple.png')} style={styles.socialIcon} />
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.socialBtn}>
+                <Image source={require('../../assets/images/facebook.png')} style={styles.socialIcon} />
+              </TouchableOpacity>
+            </View>
 
-          <TouchableOpacity style={styles.socialBtn}>
-            <Image source={require('../../assets/images/facebook.png')} style={{ width: 22, height: 22 }} resizeMode="contain" />
-          </TouchableOpacity>
-        </View>
-
-        {/* FOOTER */}
-          <Text style={styles.footer}>
-          Don't have an account?{' '}
-          <Text onPress={() => router.push('/signup/page')} style={{ fontWeight: 'bold' }}>Sign Up</Text>
-        </Text>
-      </View>
+            <Text style={styles.footer}>
+              Don't have an account?{' '}
+              <Text onPress={() => router.push('/signup/page')} style={styles.signUpLink}>Sign Up</Text>
+            </Text>
+          </View>
+        </KeyboardAvoidingView>
+      </TouchableWithoutFeedback>
     </ImageBackground>
   );
 }

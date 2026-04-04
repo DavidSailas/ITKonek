@@ -1,0 +1,73 @@
+import { StyleSheet, Dimensions, Platform, StatusBar } from 'react-native';
+
+const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
+
+const scale = (size) => (SCREEN_WIDTH / 408) * size;
+const verticalScale = (size) => (SCREEN_HEIGHT / 906) * size;
+const moderateScale = (size, factor = 0.5) => size + (scale(size) - size) * factor;
+
+export default StyleSheet.create({
+  container: { flex: 1, backgroundColor: '#FFF' },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingTop: Platform.OS === 'ios' ? verticalScale(55) : (StatusBar.currentHeight || 0) + 10,
+    paddingBottom: verticalScale(20),
+    paddingHorizontal: scale(20),
+    borderBottomWidth: 1,
+    borderBottomColor: '#F0F0F0',
+  },
+  headerTitle: { fontSize: moderateScale(18), fontWeight: 'bold', color: '#111' },
+  formBody: { padding: scale(20), paddingBottom: verticalScale(140) },
+  stepper: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginBottom: verticalScale(30) },
+  stepLine: { width: scale(30), height: 2, backgroundColor: '#EEE' },
+  stepCircleActive: {
+    width: scale(30),
+    height: scale(30),
+    borderRadius: scale(15),
+    backgroundColor: '#111',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  stepCircle: {
+    width: scale(30),
+    height: scale(30),
+    borderRadius: scale(15),
+    backgroundColor: '#EEE',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  stepTextActive: { color: '#FFF', fontSize: moderateScale(12), fontWeight: 'bold' },
+  stepText: { color: '#888', fontSize: moderateScale(12) },
+  group: { marginBottom: verticalScale(18) },
+  labelRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: verticalScale(8) },
+  label: { fontSize: moderateScale(14), fontWeight: '600', color: '#111' },
+  error: { color: '#DC2626', fontSize: moderateScale(11), fontWeight: '700' },
+  errorBorder: { borderColor: '#DC2626', borderWidth: 1.5 },
+  inputWrapper: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#F8F9FA', borderRadius: scale(12), paddingHorizontal: scale(15), borderWidth: 1, borderColor: '#EEE' },
+  inputIcon: { marginRight: scale(10) },
+  input: { flex: 1, height: verticalScale(50), color: '#111', fontSize: moderateScale(14) },
+  textArea: { height: verticalScale(110), backgroundColor: '#F8F9FA', borderRadius: scale(12), padding: scale(15), textAlignVertical: 'top', borderWidth: 1, borderColor: '#EEE', fontSize: moderateScale(14), color: '#111' },
+  row: { flexDirection: 'row', justifyContent: 'space-between' },
+  dateTimeBtn: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#F8F9FA', padding: scale(15), borderRadius: scale(12), width: '48%', borderWidth: 1, borderColor: '#EEE' },
+  dateTimeText: { marginLeft: scale(10), fontSize: moderateScale(13), color: '#111', flex: 1 },
+  urgencyRow: { flexDirection: 'row', justifyContent: 'space-between', marginTop: verticalScale(10) },
+  urgencyBtn: { paddingVertical: verticalScale(10), paddingHorizontal: scale(15), borderRadius: scale(20), backgroundColor: '#F8F9FA', borderWidth: 1, borderColor: '#EEE', minWidth: '30%', alignItems: 'center' },
+  urgencyBtnActive: { backgroundColor: '#111', borderColor: '#111' },
+  urgencyText: { fontSize: moderateScale(11), color: '#888' },
+  urgencyTextActive: { color: '#FFF', fontWeight: 'bold' },
+  uploadBtn: { height: verticalScale(100), borderWidth: 1, borderColor: '#EEE', borderStyle: 'dashed', borderRadius: scale(12), justifyContent: 'center', alignItems: 'center', backgroundColor: '#F8F9FA', marginTop: verticalScale(10) },
+  uploadText: { marginTop: verticalScale(8), fontSize: moderateScale(12), color: '#888' },
+  backStepLink: { marginTop: 20, alignSelf: 'center' },
+  backStepText: { color: '#888', fontWeight: '600', textDecorationLine: 'underline' },
+  footer: { position: 'absolute', bottom: 0, left: 0, right: 0, padding: scale(20), paddingBottom: Platform.OS === 'ios' ? verticalScale(35) : verticalScale(20), borderTopWidth: 1, borderTopColor: '#F0F0F0', backgroundColor: '#FFF' },
+  submitBtn: { backgroundColor: '#111', height: verticalScale(55), borderRadius: scale(15), flexDirection: 'row', justifyContent: 'center', alignItems: 'center' },
+  submitBtnText: { color: '#FFF', fontSize: moderateScale(16), fontWeight: 'bold', marginRight: scale(10) },
+  modalOverlay: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(0,0,0,0.6)', justifyContent: 'center', alignItems: 'center', zIndex: 2000 },
+  modalContainer: { width: '85%', backgroundColor: '#FFF', borderRadius: 25, padding: 30, alignItems: 'center' },
+  modalTitle: { fontSize: moderateScale(20), fontWeight: '800', marginBottom: 10 },
+  modalMessage: { fontSize: moderateScale(14), textAlign: 'center', color: '#666', marginBottom: 25 },
+  modalButton: { backgroundColor: '#111', paddingVertical: 14, paddingHorizontal: 50, borderRadius: 12 },
+  modalButtonText: { color: '#FFF', fontWeight: '700' },
+});

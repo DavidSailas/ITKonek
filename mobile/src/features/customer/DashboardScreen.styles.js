@@ -1,18 +1,30 @@
-import { StyleSheet } from 'react-native';
+import { StyleSheet, Dimensions, Platform, StatusBar } from 'react-native';
+
+const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
+
+// Base dimensions from your phone (408 x 906)
+const guidelineBaseWidth = 408;
+const guidelineBaseHeight = 906;
+
+const scale = (size) => (SCREEN_WIDTH / guidelineBaseWidth) * size;
+const verticalScale = (size) => (SCREEN_HEIGHT / guidelineBaseHeight) * size;
+const moderateScale = (size, factor = 0.5) => size + (scale(size) - size) * factor;
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#F8F9FA',
   },
-
-  /* HEADER */
+  /* FIXED HEADER */
   header: {
     backgroundColor: '#111',
-    padding: 20,
-    paddingTop: 60,
-    borderBottomLeftRadius: 30,
-    borderBottomRightRadius: 30,
+    paddingHorizontal: scale(20),
+    paddingBottom: verticalScale(25),
+    // Use StatusBar height to ensure it fits notches/dynamic islands
+    paddingTop: Platform.OS === 'ios' ? verticalScale(50) : (StatusBar.currentHeight || 0) + verticalScale(10),
+    borderBottomLeftRadius: scale(30),
+    borderBottomRightRadius: scale(30),
+    zIndex: 10,
   },
   headerTop: {
     flexDirection: 'row',
@@ -21,152 +33,148 @@ const styles = StyleSheet.create({
   },
   greeting: {
     color: '#fff',
-    fontSize: 20,
+    fontSize: moderateScale(22),
     fontWeight: 'bold',
   },
   notificationWrapper: {
     backgroundColor: '#fff',
-    padding: 10,
-    borderRadius: 10,
+    padding: scale(10),
+    borderRadius: scale(12),
   },
   notificationDot: {
     position: 'absolute',
-    top: 11,
-    right: 13,
-    width: 7,
-    height: 7,
-    backgroundColor: 'red',
-    borderRadius: 5,
+    top: scale(10),
+    right: scale(12),
+    width: scale(8),
+    height: scale(8),
+    backgroundColor: '#FF3B30',
+    borderRadius: scale(4),
+    borderWidth: 1.5,
+    borderColor: '#fff',
   },
-
-  /* SEARCH */
   searchBar: {
     backgroundColor: '#fff',
-    borderRadius: 25,
-    marginTop: 15,
+    borderRadius: scale(15),
+    marginTop: verticalScale(20),
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 15,
+    paddingHorizontal: scale(15),
+    height: verticalScale(50),
   },
   searchInput: {
-    marginLeft: 10,
+    marginLeft: scale(10),
     flex: 1,
-    height: 45,
+    fontSize: moderateScale(14),
   },
-
   /* BODY */
   body: {
-    padding: 20,
+    padding: scale(20),
+    paddingBottom: verticalScale(120),
   },
-
+  /* CATEGORY CHIPS */
+  categoryChip: {
+    backgroundColor: '#fff',
+    paddingHorizontal: scale(18),
+    paddingVertical: verticalScale(10),
+    borderRadius: scale(12),
+    marginRight: scale(10),
+    borderWidth: 1,
+    borderColor: '#eee',
+  },
+  categoryText: { 
+    fontSize: moderateScale(13), 
+    fontWeight: '600', 
+    color: '#555' 
+  },
   /* SERVICE CARD */
   serviceCard: {
-    backgroundColor: '#222',
-    borderRadius: 20,
-    padding: 20,
-    marginBottom: 20,
+    backgroundColor: '#111',
+    borderRadius: scale(20),
+    padding: scale(20),
+    marginBottom: verticalScale(25),
   },
-  serviceLabel: {
-    color: '#aaa',
-  },
-  ticket: {
-    color: '#fff',
-    fontWeight: 'bold',
-    marginBottom: 10,
-  },
-  serviceRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 15,
-  },
-  avatar: {
-    width: 45,
-    height: 45,
-    borderRadius: 25,
-    marginRight: 10,
-  },
-  serviceTitle: {
-    color: '#fff',
-    fontWeight: 'bold',
-  },
-  serviceSub: {
-    color: '#ccc',
-  },
-  cardActions: {
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
-    gap: 10,
-  },
-  cardBtn: {
-    width: 40,
-    height: 30,
-    backgroundColor: '#555',
-    borderRadius: 8,
-  },
-
+  serviceLabel: { color: '#888', fontSize: moderateScale(12), marginBottom: verticalScale(4) },
+  ticket: { color: '#fff', fontWeight: 'bold', fontSize: moderateScale(14), marginBottom: verticalScale(15) },
+  serviceRow: { flexDirection: 'row', alignItems: 'center' },
+  avatar: { width: scale(45), height: scale(45), borderRadius: scale(22.5), marginRight: scale(12) },
+  serviceTitle: { color: '#fff', fontWeight: 'bold', fontSize: moderateScale(16) },
+  serviceSub: { color: '#aaa', fontSize: moderateScale(13) },
   /* QUICK ACTIONS */
   quickActions: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 20,
+    marginBottom: verticalScale(25),
   },
-  actionItem: {
-    alignItems: 'center',
-  },
+  actionItem: { alignItems: 'center' },
   actionCircle: {
-    width: 50,
-    height: 50,
-    borderRadius: 50,
-    borderWidth: 1,
+    width: scale(55),
+    height: scale(55),
+    backgroundColor: '#fff',
+    borderRadius: scale(18),
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 5,
+    marginBottom: verticalScale(8),
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
   },
-  actionText: {
-    fontSize: 12,
-  },
-
-  /* SECTION */
+  actionText: { fontSize: moderateScale(12), fontWeight: '500', color: '#333' },
+  /* SECTIONS */
   sectionHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 10,
+    alignItems: 'center',
+    marginBottom: verticalScale(15),
   },
-  sectionTitle: {
-    fontWeight: 'bold',
-    fontSize: 16,
-  },
-  seeAll: {
-    color: '#888',
-  },
-
-  /* CHIPS */
-  chipsContainer: {
-    flexDirection: 'row',
-    gap: 10,
-    marginBottom: 20,
-  },
-  chip: {
-    paddingHorizontal: 15,
-    paddingVertical: 8,
-    backgroundColor: '#eee',
-    borderRadius: 20,
-  },
-  chipText: {
-    fontSize: 12,
-  },
-
-  /* GRID */
-  grid: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
+  sectionTitle: { fontSize: moderateScale(18), fontWeight: 'bold', color: '#111' },
+  seeAll: { color: '#888', fontSize: moderateScale(13) },
+  /* CAROUSEL */
   gridItem: {
-    width: '48%',
-    height: 120,
-    backgroundColor: '#ddd',
-    borderRadius: 15,
+    width: SCREEN_WIDTH * 0.45,
+    height: verticalScale(140),
+    backgroundColor: '#000',
+    borderRadius: scale(20),
+    marginRight: scale(15),
+    overflow: 'hidden',
   },
+  gridImage: { width: '100%', height: '100%', position: 'absolute', opacity: 0.7 },
+  gridOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.1)', justifyContent: 'flex-end', padding: scale(15) },
+  gridItemText: { color: '#fff', fontWeight: 'bold', fontSize: moderateScale(14) },
+  /* TECH CARDS */
+  techCard: {
+    backgroundColor: '#fff',
+    padding: scale(15),
+    borderRadius: scale(20),
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: verticalScale(12),
+    elevation: 1,
+  },
+  techImage: { width: scale(50), height: scale(50), borderRadius: scale(15), marginRight: scale(15) },
+  techName: { fontSize: moderateScale(15), fontWeight: 'bold', color: '#111' },
+  techSub: { fontSize: moderateScale(12), color: '#888' },
+  ratingRow: { 
+    flexDirection: 'row', 
+    alignItems: 'center', 
+    backgroundColor: '#F0F0F0', 
+    padding: scale(5), 
+    borderRadius: scale(8) 
+  },
+  ratingText: { marginLeft: scale(4), fontSize: moderateScale(12), fontWeight: 'bold' },
+  /* TRUST BANNER */
+  trustBanner: {
+    backgroundColor: '#E3F2FD',
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: scale(20),
+    borderRadius: scale(20),
+    marginTop: verticalScale(10),
+    borderWidth: 1,
+    borderColor: '#BBDEFB',
+  },
+  trustTitle: { fontSize: moderateScale(16), fontWeight: 'bold', color: '#111' },
+  trustSub: { fontSize: moderateScale(12), color: '#555' },
 });
 
 export default styles;

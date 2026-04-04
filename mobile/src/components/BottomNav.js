@@ -2,13 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, Dimensions, LayoutAnimation, Platform, UIManager } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 import { Ionicons } from '@expo/vector-icons'; 
-import { styles } from './BottomNav.styles';
+import styles, { scale, verticalScale } from './BottomNav.styles'; // Import scaling utilities
 import { useRouter, usePathname } from 'expo-router';
 
-// Enable LayoutAnimation for Android
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
 }
+
+const { width: screenWidth } = Dimensions.get('window');
 
 const BottomNav = () => {
   const [activeTab, setActiveTab] = useState('home');
@@ -26,26 +27,22 @@ const BottomNav = () => {
     if (!pathname) return;
     const match = tabs.find(t => pathname.includes(t.name));
     if (match) {
-      // Smoothly animate the transition when the route changes
       LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
       setActiveTab(match.name);
     }
   }, [pathname]);
 
   const handlePress = (tab) => {
-    // Simple, clean animation trigger
     LayoutAnimation.configureNext(LayoutAnimation.Presets.spring);
     setActiveTab(tab.name);
     router.push(tab.route);
   };
 
-  const screenWidth = Dimensions.get('window').width;
-
   return (
     <View style={styles.container}>
-      {/* SVG Background - Clean Black foundation */}
+      {/* SVG Background - Scaled proportionally */}
       <View style={{ position: 'absolute', bottom: 0 }}>
-        <Svg width={screenWidth} height={80} viewBox={`0 0 ${screenWidth} 80`}>
+        <Svg width={screenWidth} height={verticalScale(80)} viewBox={`0 0 ${screenWidth} 80`}>
           <Path
             d={`M0 20 L${screenWidth} 20 L${screenWidth} 80 L0 80 Z`}
             fill="#1A1A1A"
@@ -64,14 +61,13 @@ const BottomNav = () => {
               onPress={() => handlePress(tab)}
               activeOpacity={0.8}
             >
-              {/* This circle now slides smoothly between tabs */}
               {isActive && (
                 <View style={styles.activeCircle}>
-                  <Ionicons name={tab.activeIcon} size={28} color="#1A1A1A" />
+                  <Ionicons name={tab.activeIcon} size={scale(28)} color="#1A1A1A" />
                 </View>
               )}
 
-              {!isActive && <Ionicons name={tab.icon} size={24} color="#fff" />}
+              {!isActive && <Ionicons name={tab.icon} size={scale(24)} color="#fff" />}
 
               <Text style={isActive ? styles.label : styles.inactiveLabel}>
                 {tab.label}

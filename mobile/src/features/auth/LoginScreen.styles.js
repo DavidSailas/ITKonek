@@ -1,114 +1,157 @@
-import { StyleSheet } from 'react-native';
+import { StyleSheet, Dimensions, Platform } from 'react-native';
 
-const styles = StyleSheet.create({
+const { width: SCREEN_WIDTH } = Dimensions.get('window');
+const scale = (size) => (SCREEN_WIDTH / 408) * size;
+
+export default StyleSheet.create({
   container: {
     flex: 1,
   },
   header: {
-    height: '30%',
+    flex: 1, // Crucial: This section shrinks when keyboard is open
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 20,
+    paddingTop: scale(40),
+  },
+  logo: {
+    width: scale(72),
+    height: scale(72),
+    marginBottom: 10,
+    tintColor: '#fff',
   },
   title: {
     color: '#fff',
-    fontSize: 22,
+    fontSize: scale(22),
     fontWeight: 'bold',
-    marginTop: 10,
   },
   subtitle: {
     color: '#ccc',
-    fontSize: 14,
+    fontSize: scale(14),
     marginTop: 5,
   },
   formContainer: {
-    flex: 1,
-    backgroundColor: 'rgba(255,255,255,0.95)',
+    backgroundColor: '#F5F5F5', // Off-white as seen in your screenshot
+    borderTopLeftRadius: 50,
     borderTopRightRadius: 50,
-    padding: 25,
+    paddingHorizontal: scale(30),
+    paddingTop: scale(35),
+    paddingBottom: Platform.OS === 'ios' ? scale(45) : scale(30),
+    width: '100%',
   },
   group: {
-    marginBottom: 18,
+    marginBottom: scale(18),
   },
   labelRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    marginBottom: 6,
   },
   label: {
     fontWeight: 'bold',
-    fontSize: 13,
+    fontSize: scale(13),
+    color: '#333',
   },
   error: {
-    color: 'red',
-    fontSize: 12,
+    color: '#DC2626',
+    fontSize: scale(11),
   },
   inputGroup: {
     flexDirection: 'row',
     alignItems: 'center',
-    borderWidth: 1.5,
-    borderColor: '#ccc',
-    borderRadius: 10,
-    paddingHorizontal: 10,
-    marginTop: 6,
+    borderWidth: 1,
+    borderColor: '#DDD',
+    borderRadius: 15,
+    paddingHorizontal: 15,
+    height: scale(54),
+    backgroundColor: '#FFF',
   },
   errorBorder: {
-    borderColor: 'red',
+    borderColor: '#DC2626',
   },
   input: {
     flex: 1,
-    padding: 12,
+    paddingHorizontal: 10,
+    fontSize: scale(14),
+    color: '#000',
   },
   controls: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginVertical: 10,
+    alignItems: 'center',
+    marginVertical: scale(10),
+  },
+  checkbox: {
+    width: 18,
+    height: 18,
+    borderRadius: 4,
+    borderWidth: 1,
+    borderColor: '#666',
+    marginRight: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  checkboxActive: {
+    backgroundColor: '#444',
+    borderColor: '#444',
   },
   remember: {
-    fontSize: 12,
+    fontSize: scale(12),
+    color: '#666',
   },
   forgot: {
-    fontSize: 12,
+    fontSize: scale(12),
+    color: '#444',
+    fontWeight: 'bold',
   },
   loginBtn: {
     backgroundColor: '#000',
-    padding: 14,
-    borderRadius: 10,
+    height: scale(55),
+    borderRadius: 15,
     alignItems: 'center',
-    marginBottom: 20,
+    justifyContent: 'center',
+    marginTop: scale(10),
   },
   loginText: {
     color: '#fff',
     fontWeight: 'bold',
+    fontSize: scale(16),
   },
   divider: {
     textAlign: 'center',
-    color: '#888',
-    marginVertical: 15,
+    color: '#999',
+    marginVertical: scale(20),
+    fontSize: scale(12),
   },
   socials: {
     flexDirection: 'row',
     justifyContent: 'center',
-    gap: 15,
-    marginBottom: 20,
+    gap: scale(15),
   },
   socialBtn: {
-    width: 50,
-    height: 50,
-    borderRadius: 50,
-    borderWidth: 1,
-    borderColor: '#ccc',
+    width: scale(50),
+    height: scale(50),
+    borderRadius: 25,
+    backgroundColor: '#FFF',
     justifyContent: 'center',
     alignItems: 'center',
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
   },
   socialIcon: {
     width: 24,
     height: 24,
   },
   footer: {
-    marginTop: '40%',
+    marginTop: scale(25),
     textAlign: 'center',
-    color: '#555',
+    color: '#777',
+    fontSize: scale(13),
   },
+  signUpLink: {
+    color: '#000',
+    fontWeight: 'bold',
+  }
 });
-
-export default styles;
