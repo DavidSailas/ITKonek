@@ -64,7 +64,6 @@ export default function SignUpScreen() {
       const userCredential = await createUserWithEmailAndPassword(auth, form.email, form.password);
       const user = userCredential.user;
 
-      // Save user record
       await setDoc(doc(db, 'users', user.uid), {
         firstName: form.firstName,
         lastName: form.lastName,
@@ -74,7 +73,6 @@ export default function SignUpScreen() {
         createdAt: new Date(),
       });
 
-      // Save customer profile subcollection
       await setDoc(doc(db, 'users', user.uid, 'customerProfile', 'profile'), {
         contactNumber: form.contact,
         preferences: { notificationsEnabled: true, loyaltyPoints: 0 },
@@ -85,7 +83,7 @@ export default function SignUpScreen() {
       setTimeout(() => router.push('/login/page'), 2000);
     } catch (err) {
       let msg = 'Something went wrong.';
-      if (err.code === 'auth/email-already-in-use') msg = 'Email is already taken.';
+      if (err.code === 'auth/email-already-in-use') msg = 'Email already taken.';
       setModalMessage(msg);
       setModalVisible(true);
     } finally {
@@ -114,6 +112,7 @@ export default function SignUpScreen() {
           secureTextEntry={secure && !isVisible}
           keyboardType={keyboard}
           autoCapitalize={key === "email" ? "none" : "words"}
+          placeholderTextColor="#aaa"
         />
         {toggle && (
           <TouchableOpacity onPress={toggle}>
@@ -126,15 +125,25 @@ export default function SignUpScreen() {
 
   return (
     <ImageBackground source={require('../../assets/backgrounds/mobile-bg.png')} style={styles.container} resizeMode="cover">
-      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }}>
-        <ScrollView contentContainerStyle={{ flexGrow: 1 }} showsVerticalScrollIndicator={false}>
+      <KeyboardAvoidingView 
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined} 
+        style={{ flex: 1 }}
+      >
+        <ScrollView 
+          contentContainerStyle={styles.scrollContent} 
+          showsVerticalScrollIndicator={false}
+          bounces={false}
+        >
           <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
             <View style={{ flex: 1 }}>
+              
+              {/* HEADER: Flex 1 allows it to contract when keyboard opens */}
               <View style={styles.header}>
-                <Image source={require('../../assets/logo/logo.png')} style={{ width: 72, height: 72, tintColor: '#fff' }} resizeMode="contain" />
+                <Image source={require('../../assets/logo/logo.png')} style={styles.logo} resizeMode="contain" />
                 <Text style={styles.title}>Let’s get you Started</Text>
               </View>
 
+              {/* FORM CONTAINER: Fixed to bottom */}
               <View style={styles.formContainer}>
                 {renderInput("First Name", "firstName", "person", "Enter first name")}
                 {renderInput("Last Name", "lastName", "person", "Enter last name")}
@@ -171,6 +180,7 @@ export default function SignUpScreen() {
                   By signing up, you agree to the <Text style={styles.boldText}>Terms of Service</Text> and <Text style={styles.boldText}>Data Privacy</Text>
                 </Text>
               </View>
+
             </View>
           </TouchableWithoutFeedback>
         </ScrollView>

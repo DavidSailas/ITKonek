@@ -1,34 +1,28 @@
-import { StyleSheet, Dimensions } from 'react-native';
+import { StyleSheet, Dimensions, Platform } from 'react-native';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
-
-// Scale factor based on Infinix GT 30 Pro width (408px)
 const scale = (size) => (SCREEN_WIDTH / 408) * size;
 
-const styles = StyleSheet.create({
+export default StyleSheet.create({
   container: {
     flex: 1,
   },
-  scrollContainer: {
-    flexGrow: 1,
-  },
   header: {
-    paddingTop: scale(60),
-    paddingBottom: scale(30),
+    flex: 1, // Crucial: This section shrinks when keyboard is open
     justifyContent: 'center',
     alignItems: 'center',
+    paddingTop: scale(40),
   },
   logo: {
     width: scale(72),
     height: scale(72),
-    marginBottom: 12,
+    marginBottom: 10,
     tintColor: '#fff',
   },
   title: {
     color: '#fff',
     fontSize: scale(22),
     fontWeight: 'bold',
-    marginTop: 10,
   },
   subtitle: {
     color: '#ccc',
@@ -36,12 +30,13 @@ const styles = StyleSheet.create({
     marginTop: 5,
   },
   formContainer: {
-    flex: 1,
-    backgroundColor: 'rgba(255,255,255,0.95)',
+    backgroundColor: '#F5F5F5', // Off-white as seen in your screenshot
+    borderTopLeftRadius: 50,
     borderTopRightRadius: 50,
-    padding: scale(25),
-    // Ensures content has space even on very short phones
-    minHeight: scale(500), 
+    paddingHorizontal: scale(30),
+    paddingTop: scale(35),
+    paddingBottom: Platform.OS === 'ios' ? scale(45) : scale(30),
+    width: '100%',
   },
   group: {
     marginBottom: scale(18),
@@ -49,8 +44,7 @@ const styles = StyleSheet.create({
   labelRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 4,
+    marginBottom: 6,
   },
   label: {
     fontWeight: 'bold',
@@ -58,17 +52,18 @@ const styles = StyleSheet.create({
     color: '#333',
   },
   error: {
-    color: '#DC2626', // Use a standard red
+    color: '#DC2626',
     fontSize: scale(11),
   },
   inputGroup: {
     flexDirection: 'row',
     alignItems: 'center',
-    borderWidth: 1.5,
-    borderColor: '#ccc',
-    borderRadius: 12,
-    paddingHorizontal: 12,
-    height: scale(52),
+    borderWidth: 1,
+    borderColor: '#DDD',
+    borderRadius: 15,
+    paddingHorizontal: 15,
+    height: scale(54),
+    backgroundColor: '#FFF',
   },
   errorBorder: {
     borderColor: '#DC2626',
@@ -82,22 +77,38 @@ const styles = StyleSheet.create({
   controls: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginVertical: scale(12),
+    alignItems: 'center',
+    marginVertical: scale(10),
+  },
+  checkbox: {
+    width: 18,
+    height: 18,
+    borderRadius: 4,
+    borderWidth: 1,
+    borderColor: '#666',
+    marginRight: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  checkboxActive: {
+    backgroundColor: '#444',
+    borderColor: '#444',
   },
   remember: {
     fontSize: scale(12),
-    color: '#555',
+    color: '#666',
   },
   forgot: {
     fontSize: scale(12),
-    color: '#555', 
-    fontWeight: '600',
+    color: '#444',
+    fontWeight: 'bold',
   },
   loginBtn: {
     backgroundColor: '#000',
-    padding: scale(15),
-    borderRadius: 12,
+    height: scale(55),
+    borderRadius: 15,
     alignItems: 'center',
+    justifyContent: 'center',
     marginTop: scale(10),
   },
   loginText: {
@@ -107,7 +118,7 @@ const styles = StyleSheet.create({
   },
   divider: {
     textAlign: 'center',
-    color: '#888',
+    color: '#999',
     marginVertical: scale(20),
     fontSize: scale(12),
   },
@@ -120,24 +131,27 @@ const styles = StyleSheet.create({
     width: scale(50),
     height: scale(50),
     borderRadius: 25,
-    borderWidth: 1,
-    borderColor: '#eee',
+    backgroundColor: '#FFF',
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#fff',
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+  },
+  socialIcon: {
+    width: 24,
+    height: 24,
   },
   footer: {
-    marginTop: 'auto', // Pushes to bottom of formContainer
-    paddingTop: scale(30),
-    paddingBottom: scale(20),
+    marginTop: scale(25),
     textAlign: 'center',
-    color: '#555',
-    fontSize: scale(14),
+    color: '#777',
+    fontSize: scale(13),
   },
   signUpLink: {
-    color: '#555', 
+    color: '#000',
     fontWeight: 'bold',
   }
 });
-
-export default styles;

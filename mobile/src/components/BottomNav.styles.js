@@ -1,42 +1,53 @@
-import { StyleSheet, Dimensions } from 'react-native';
-const { width } = Dimensions.get('window');
+import { StyleSheet, Dimensions, Platform } from 'react-native';
 
-export const styles = StyleSheet.create({
+const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
+
+// Base dimensions from your phone
+const guidelineBaseWidth = 408;
+const guidelineBaseHeight = 906;
+
+export const scale = (size) => (SCREEN_WIDTH / guidelineBaseWidth) * size;
+export const verticalScale = (size) => (SCREEN_HEIGHT / guidelineBaseHeight) * size;
+const moderateScale = (size, factor = 0.5) => size + (scale(size) - size) * factor;
+
+export default StyleSheet.create({
   container: {
     position: 'absolute',
     bottom: 0,
-    width: width,
-    height: 120,
-    justifyContent: 'center',
-    alignItems: 'center',
+    width: SCREEN_WIDTH,
+    // Higher container to account for the "popping" active circle
+    height: verticalScale(100), 
+    justifyContent: 'flex-end',
     backgroundColor: 'transparent',
   },
 
   contentHolder: {
     flexDirection: 'row',
-    width: width,
-    height: 60,
-    backgroundColor: '#1A1A1A', // main black nav background
+    width: SCREEN_WIDTH,
+    // Add extra padding at bottom for iPhone "notches" (Safe Area)
+    height: Platform.OS === 'ios' ? verticalScale(85) : verticalScale(70),
+    backgroundColor: '#1A1A1A',
     alignItems: 'center',
     justifyContent: 'space-around',
+    paddingBottom: Platform.OS === 'ios' ? verticalScale(20) : verticalScale(5),
   },
 
   iconWrapper: {
     alignItems: 'center',
     justifyContent: 'center',
-    width: width / 4,
+    width: SCREEN_WIDTH / 4,
   },
 
   activeCircle: {
     position: 'absolute',
-    top: -25,
-    width: 60,
-    height: 60,
-    borderRadius: 30,
+    // Moves the circle up proportionally
+    top: verticalScale(-30),
+    width: scale(60),
+    height: scale(60),
+    borderRadius: scale(30),
     backgroundColor: '#fff',
     justifyContent: 'center',
     alignItems: 'center',
-    // Professional depth shadow
     elevation: 8,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
@@ -46,15 +57,16 @@ export const styles = StyleSheet.create({
   },
 
   label: {
-    fontSize: 12,
-    color: '#fff', // white label
-    fontWeight: '500',
-    marginTop: 45,
+    fontSize: moderateScale(11),
+    color: '#fff',
+    fontWeight: '600',
+    // Ensures the label stays below the circle
+    marginTop: verticalScale(40),
   },
 
   inactiveLabel: {
-    fontSize: 12,
-    color: '#aaa', // grey for inactive
-    marginTop: 4,
+    fontSize: moderateScale(11),
+    color: '#aaa',
+    marginTop: verticalScale(4),
   },
 });

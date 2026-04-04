@@ -1,36 +1,48 @@
-import { StyleSheet, Dimensions } from 'react-native';
+import { StyleSheet, Dimensions, Platform } from 'react-native';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const scale = (size) => (SCREEN_WIDTH / 408) * size;
 
-const styles = StyleSheet.create({
+export default StyleSheet.create({
   container: {
     flex: 1,
   },
+  scrollContent: {
+    flexGrow: 1,
+    justifyContent: 'flex-end', 
+  },
   header: {
-    paddingTop: scale(50),
-    paddingBottom: scale(40),
+    flex: 1,
+    minHeight: scale(130),
     justifyContent: 'center',
     alignItems: 'center',
+    paddingTop: scale(40),
+    paddingBottom: scale(10),
+  },
+  logo: {
+    width: scale(72),
+    height: scale(72),
+    tintColor: '#fff',
+    marginTop: 25,
   },
   title: {
     color: '#fff',
-    fontSize: scale(24),
+    fontSize: scale(22),
     fontWeight: '700',
     marginTop: 10,
     textAlign: 'center',
   },
   formContainer: {
-    flex: 1,
     backgroundColor: '#fff',
+    borderTopLeftRadius: 40, // Added for symmetry
     borderTopRightRadius: 40,
-    marginTop: -30,
     paddingTop: scale(30),
     paddingHorizontal: scale(25),
-    paddingBottom: scale(20),
+    paddingBottom: Platform.OS === 'ios' ? scale(45) : scale(25),
+    width: '100%',
   },
   group: {
-    marginBottom: scale(18),
+    marginBottom: scale(15),
   },
   labelRow: {
     flexDirection: 'row',
@@ -119,7 +131,7 @@ const styles = StyleSheet.create({
     paddingVertical: scale(16),
     borderRadius: 12,
     alignItems: 'center',
-    marginBottom: scale(15),
+    marginBottom: scale(12),
   },
   signUpText: {
     color: '#fff',
@@ -128,16 +140,16 @@ const styles = StyleSheet.create({
   },
   backToLoginText: {
     fontSize: scale(14),
-    color: '#555', // Neutral theme
+    color: '#555',
     textAlign: 'center',
-    marginBottom: scale(20),
+    marginBottom: scale(10),
   },
   footer: {
-    fontSize: scale(12),
+    fontSize: scale(11),
     textAlign: 'center',
     color: '#888',
-    marginTop: scale(20),
-    paddingBottom: scale(20),
+    marginTop: scale(10),
+    paddingBottom: scale(10),
   },
   boldText: {
     fontWeight: 'bold',
@@ -162,5 +174,3 @@ const styles = StyleSheet.create({
   modalButton: { backgroundColor: '#000', paddingVertical: 12, paddingHorizontal: 40, borderRadius: 10 },
   modalButtonText: { color: '#fff', fontWeight: '600' },
 });
-
-export default styles;

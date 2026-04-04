@@ -1,5 +1,4 @@
 import { StyleSheet, Dimensions } from 'react-native';
-
 const { width } = Dimensions.get('window');
 
 export const styles = StyleSheet.create({
@@ -17,7 +16,7 @@ export const styles = StyleSheet.create({
     flexDirection: 'row',
     width: width,
     height: 60,
-    backgroundColor: '#1A1A1A',
+    backgroundColor: '#1A1A1A', // main black nav background
     alignItems: 'center',
     justifyContent: 'space-around',
   },
@@ -30,31 +29,32 @@ export const styles = StyleSheet.create({
 
   activeCircle: {
     position: 'absolute',
-    top: -30,
+    top: -25,
     width: 60,
     height: 60,
     borderRadius: 30,
-    backgroundColor: '#16A34A', // ✅ green color
+    backgroundColor: '#fff',
     justifyContent: 'center',
     alignItems: 'center',
-    elevation: 5,
+    // Professional depth shadow
+    elevation: 8,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
-    shadowRadius: 4,
+    shadowRadius: 5,
     zIndex: 10,
   },
 
   label: {
     fontSize: 12,
-    color: '#fff',
+    color: '#fff', // white label
     fontWeight: '500',
-    marginTop: 35,
+    marginTop: 45,
   },
 
   inactiveLabel: {
     fontSize: 12,
-    color: '#666',
+    color: '#aaa', // grey for inactive
     marginTop: 4,
   },
 });

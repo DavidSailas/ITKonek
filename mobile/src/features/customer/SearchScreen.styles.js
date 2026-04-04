@@ -1,239 +1,100 @@
-import { StyleSheet, Dimensions } from 'react-native';
+import { StyleSheet, Dimensions, Platform, StatusBar } from 'react-native';
 
-const { width, height } = Dimensions.get('window');
+const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
+
+const scale = (size) => (SCREEN_WIDTH / 408) * size;
+const verticalScale = (size) => (SCREEN_HEIGHT / 906) * size;
+const moderateScale = (size, factor = 0.5) => size + (scale(size) - size) * factor;
 
 export default StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-  },
-  /* MAP STYLES */
-  mapWrapper: {
-    ...StyleSheet.absoluteFillObject,
-  },
-  mapImage: {
-    width: width,
-    height: height,
-  },
-  engineerDot: {
-    position: 'absolute',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  dotPulse: {
-    position: 'absolute',
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: 'rgba(0, 128, 128, 0.2)',
-  },
-  /* USER LOCATION (GREEN) */
-  userLocation: {
-    position: 'absolute',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  userDot: {
-    width: 16,
-    height: 16,
-    borderRadius: 8,
-    backgroundColor: '#2ECC71', // Professional Green
-    borderWidth: 3,
-    borderColor: '#fff',
-    elevation: 5,
-  },
-  userPulse: {
-    position: 'absolute',
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: 'rgba(46, 204, 113, 0.25)',
-  },
+  container: { flex: 1, backgroundColor: '#fff' },
+  mapWrapper: { ...StyleSheet.absoluteFillObject },
+  mapImage: { width: SCREEN_WIDTH, height: SCREEN_HEIGHT },
 
-  /* ENGINEER MARKER (PROFESSIONAL TEAL/DARK) */
-  engineerMarkerContainer: {
-    position: 'absolute',
-    alignItems: 'center',
-  },
+  /* Pins & Markers */
+  engineerMarkerContainer: { position: 'absolute', alignItems: 'center', justifyContent: 'center' },
   markerPin: {
-    backgroundColor: '#004D4D', // Deep Professional Teal
-    width: 32,
-    height: 32,
-    borderRadius: 16,
+    backgroundColor: '#004D4D',
+    width: scale(32),
+    height: scale(32),
+    borderRadius: scale(16),
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 2,
-    borderColor: '#FFFFFF',
-    elevation: 6,
+    borderColor: '#FFF',
+    elevation: 4,
     shadowColor: '#000',
-    shadowOpacity: 0.3,
-    shadowRadius: 3,
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
   },
-  pulseRing: {
-    position: 'absolute',
-    top: 0,
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: 'rgba(0, 77, 77, 0.3)',
-    // In a real app, use Animated API to scale this
+  markerPinActive: {
+    backgroundColor: '#111', // Professional black switch
+    width: scale(38),
+    height: scale(38),
+    borderRadius: scale(19),
+    borderColor: '#2ECC71', // Subtle green active ring
+    borderWidth: 3,
+    elevation: 10,
+  },
+  pulseRing: { position: 'absolute', width: 0, height: 0 },
+  pulseRingActive: {
+    width: scale(60),
+    height: scale(60),
+    borderRadius: scale(30),
+    backgroundColor: 'rgba(46, 204, 113, 0.15)', // Soft green glow
   },
   markerLabel: {
-    backgroundColor: '#FFFFFF',
-    paddingHorizontal: 6,
+    backgroundColor: '#FFF',
+    paddingHorizontal: 8,
     paddingVertical: 2,
     borderRadius: 10,
-    marginTop: 4,
+    marginTop: 5,
     borderWidth: 1,
     borderColor: '#EEE',
-    elevation: 2,
   },
-  markerLabelText: {
-    fontSize: 10,
-    fontWeight: '700',
-    color: '#333',
-  },
+  markerLabelText: { fontSize: moderateScale(10), fontWeight: '800', color: '#333' },
 
-  /* FLOATING SEARCH BAR */
-  overlayHeader: {
-    position: 'absolute',
-    top: 50,
-    width: '100%',
-    paddingHorizontal: 20,
-    zIndex: 10,
-  },
-  searchBarContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#fff',
-    borderRadius: 15,
-    height: 55,
-    elevation: 10,
+  /* User Location */
+  userLocation: { position: 'absolute', alignItems: 'center', justifyContent: 'center' },
+  userDot: { width: scale(16), height: scale(16), borderRadius: 8, backgroundColor: '#2ECC71', borderWidth: 3, borderColor: '#fff' },
+  userPulse: { position: 'absolute', width: scale(44), height: scale(44), borderRadius: 22, backgroundColor: 'rgba(46, 204, 113, 0.2)' },
+
+  /* Search Header */
+  overlayHeader: { position: 'absolute', top: Platform.OS === 'ios' ? verticalScale(50) : StatusBar.currentHeight + 10, width: '100%', paddingHorizontal: scale(20), zIndex: 10 },
+  searchBarContainer: { 
+    flexDirection: 'row', 
+    alignItems: 'center', 
+    backgroundColor: '#fff', 
+    borderRadius: 15, 
+    height: verticalScale(55), 
+    elevation: 8,
     shadowColor: '#000',
-    shadowOpacity: 0.2,
+    shadowOpacity: 0.1,
     shadowRadius: 10,
   },
-  searchInput: {
-    flex: 1,
-    paddingHorizontal: 10,
-    fontSize: 16,
-    color: '#333',
-  },
-  filterBtn: {
-    backgroundColor: '#008080',
-    padding: 10,
-    borderRadius: 10,
-    marginRight: 8,
-  },
+  searchInput: { flex: 1, paddingHorizontal: 15, fontSize: moderateScale(15), color: '#111' },
+  filterBtn: { backgroundColor: '#111', padding: 10, borderRadius: 10, marginRight: 8 },
 
-  /* ZOOM BUTTONS (MATCHING IMAGE) */
-  zoomControls: {
-    position: 'absolute',
-    right: 20,
-    top: height * 0.35,
-    backgroundColor: '#fff',
-    borderRadius: 30,
-    elevation: 5,
-    shadowOpacity: 0.1,
-  },
-  zoomBtn: {
-    width: 50,
-    height: 50,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  zoomSeparator: {
-    borderTopWidth: 1,
-    borderBottomWidth: 1,
-    borderColor: '#eee',
-  },
-
-/* BOTTOM RESULTS AREA */
-  bottomSheet: {
-    position: 'absolute',
-    bottom: 80, // Above BottomNav
-    width: '100%',
-    maxHeight: height * 0.4, // Limit height so map is still visible
-    backgroundColor: 'rgba(255,255,255,0.98)',
-    borderTopLeftRadius: 30,
-    borderTopRightRadius: 30,
-    paddingTop: 10,
-    elevation: 20,
-    shadowColor: '#000',
-    shadowOpacity: 0.2,
-    shadowRadius: 15,
-  },
-  dragHandle: {
-    width: 40,
-    height: 5,
-    backgroundColor: '#e0e0e0',
-    borderRadius: 3,
-    alignSelf: 'center',
-    marginBottom: 10,
-  },
-  resultsTitle: {
-    paddingHorizontal: 20,
-    fontSize: 15,
-    fontWeight: '800',
-    color: '#111',
-    marginBottom: 12,
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
-  },
-  resultsScroll: {
-    paddingHorizontal: 20,
-    paddingBottom: 20,
-  },
-  resultCard: {
-    backgroundColor: '#fff',
-    width: '100%', // Take full width of container
-    borderRadius: 20,
-    padding: 15,
-    marginBottom: 12, // Space between cards in the column
-    borderWidth: 1,
-    borderColor: '#f0f0f0',
-    elevation: 2,
-    shadowOpacity: 0.05,
-  },
-  cardHeader: {
+  /* Floating Card */
+  quickViewContainer: { position: 'absolute', bottom: verticalScale(110), width: SCREEN_WIDTH, paddingHorizontal: scale(20), zIndex: 100 },
+  quickViewCard: {
     flexDirection: 'row',
+    backgroundColor: '#FFF',
+    borderRadius: scale(20),
+    padding: scale(15),
     alignItems: 'center',
-    marginBottom: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.12,
+    shadowRadius: 15,
+    elevation: 12,
   },
-  avatar: {
-    width: 55,
-    height: 55,
-    borderRadius: 18,
-    backgroundColor: '#f9f9f9',
-  },
-  textGroup: {
-    marginLeft: 15,
-    flex: 1,
-  },
-  engineerName: {
-    fontWeight: 'bold',
-    fontSize: 17,
-    color: '#111',
-  },
-  engineerService: {
-    color: '#008080',
-    fontSize: 14,
-    fontWeight: '600',
-    marginVertical: 2,
-  },
-  engineerDistance: {
-    color: '#999',
-    fontSize: 12,
-  },
-  bookBtn: {
-    backgroundColor: '#111', // Professional dark button
-    paddingVertical: 12,
-    borderRadius: 12,
-    alignItems: 'center',
-  },
-  bookBtnText: {
-    color: '#fff',
-    fontWeight: 'bold',
-    fontSize: 14,
-  },
+  quickAvatar: { width: scale(60), height: scale(60), borderRadius: scale(12), backgroundColor: '#F8F9FA' },
+  quickTextGroup: { flex: 1, marginLeft: scale(15) },
+  quickName: { fontSize: moderateScale(16), fontWeight: 'bold', color: '#111' },
+  quickService: { fontSize: moderateScale(13), color: '#008080', fontWeight: '600', marginVertical: 2 },
+  quickStats: { flexDirection: 'row', alignItems: 'center' },
+  quickRating: { fontSize: moderateScale(12), fontWeight: 'bold', marginLeft: 4 },
+  quickJobs: { fontSize: moderateScale(12), color: '#888', marginLeft: 5 },
+  quickAction: { backgroundColor: '#111', width: scale(40), height: scale(40), borderRadius: scale(10), justifyContent: 'center', alignItems: 'center' },
 });
