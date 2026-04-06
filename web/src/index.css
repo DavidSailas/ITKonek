@@ -63,11 +63,10 @@
   --btn: rgb(0, 0, 0);
   --logo-color: #000000; 
   --btn-text: #FFFFFF;
-  --description: #888888;
+  --description: #5c5c5c;
   --text: #000000;
   --bg: #FFFFFF;
   --lines: rgba(156, 156, 156, 0.3);
-
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);

@@ -1,14 +1,10 @@
 import { Search } from "lucide-react";
 import { ThemeToggle } from "@/components/theme-toggle";
 
-interface HeaderProps {
-  role: 'admin' | 'superadmin';
-}
-
-export const Header = ({ role }: HeaderProps) => {
+export const Header = () => {
+ 
   return (
     <header className="h-18 border-b border-lines bg-background/80 backdrop-blur-md sticky top-0 z-20 flex items-center justify-between px-8 transition-colors duration-300">
-
       <div className="relative w-96 group">
         <Search
           className="absolute left-3 top-1/2 -translate-y-1/2 text-description group-focus-within:text-tint transition-colors"
@@ -22,7 +18,6 @@ export const Header = ({ role }: HeaderProps) => {
       </div>
 
       <div className="flex items-center gap-4">
-       
 
         <div className="h-6 w-[1px] bg-lines" />
         <ThemeToggle />
