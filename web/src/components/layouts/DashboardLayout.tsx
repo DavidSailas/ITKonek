@@ -14,7 +14,7 @@ export default function DashboardLayout() {
                 <Header role="superadmin" />
 
                 <main className="p-8 flex-1">
-                    <div className="max-w-7xl mx-auto">
+                    <div className="max-full">
                         <Outlet />
                     </div>
                 </main>

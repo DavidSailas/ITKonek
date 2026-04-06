@@ -31,8 +31,8 @@ export default function LoginPage() {
                         </svg>
                     </div>
 
-                    <h1 className="text-3xl font-bold uppercase tracking-[0.2em] font-poppins">
-                        ITKONEK
+                    <h1 className="text-3xl font-bold tracking-[0.2em] font-poppins">
+                        ITKonek
                     </h1>
 
                     <p className="text-description text-xl font-medium tracking-tight font-poppins">
