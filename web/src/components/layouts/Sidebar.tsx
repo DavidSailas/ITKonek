@@ -26,17 +26,17 @@ export const Sidebar = ({ role }: SidebarProps) => {
   };
 
   const menuItems = [
-    { name: 'Overview', icon: LayoutDashboard, path: '/dashboard' },
+    { name: 'Dashboard', icon: LayoutDashboard, path: '/dashboard' },
     { name: 'Bookings', icon: CalendarCheck, path: '/dashboard/bookings' },
     { name: 'IT Professionals', icon: Briefcase, path: '/dashboard/pros' },
     { name: 'Customers', icon: Users, path: '/dashboard/customers' },
-    { name: 'Service Categories', icon: ShieldCheck, path: '/dashboard/services' },
+    { name: 'Services', icon: ShieldCheck, path: '/dashboard/services' },
   ];
 
   const superAdminItems = [
-    { name: 'Revenue & Payouts', icon: CreditCard, path: '/dashboard/admin/finance' },
-    { name: 'Platform Analytics', icon: BarChart3, path: '/dashboard/admin/analytics' },
-    { name: 'Support Tickets', icon: MessageSquare, path: '/dashboard/admin/support' },
+    { name: 'Revenue & Payouts', icon: CreditCard, path: '/dashboard/finance' },
+    { name: 'Platform Analytics', icon: BarChart3, path: '/dashboard/analytics' },
+    { name: 'Support Tickets', icon: MessageSquare, path: '/dashboard/support' },
   ];
 
   return (
@@ -56,7 +56,7 @@ export const Sidebar = ({ role }: SidebarProps) => {
 
       {/* Navigation */}
       <nav className="flex-1 px-4 space-y-1 overflow-y-auto">
-        <p className="px-4 text-[10px] font-bold uppercase tracking-widest text-description mb-3 opacity-70">Marketplace</p>
+        <p className="px-4 text-[10px] font-bold uppercase tracking-widest text-description mb-3 opacity-70">Overview</p>
 
         {menuItems.map((item) => {
           const isActive = location.pathname === item.path;

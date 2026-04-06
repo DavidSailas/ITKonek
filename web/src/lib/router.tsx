@@ -22,7 +22,30 @@ export const router = createBrowserRouter([
       },
       {
         path: "pros",
-        element: <div>IT Professionals Management</div>,
+        element: <div>IT Professionals</div>,
+      },
+      {
+        path: "customers",
+        element: <div>Customers</div>,
+      },
+      {
+        path: "services",
+        element: <div>Services</div>,
+      },
+
+      // Super Admin
+
+      {
+        path: "finance",
+        element: <div>Revenue & Payouts</div>,
+      },
+      {
+        path: "analytics",
+        element: <div>Platform Analytics</div>,
+      },
+      {
+        path: "support",
+        element: <div>Support Tickets</div>,
       },
     ],
   },
