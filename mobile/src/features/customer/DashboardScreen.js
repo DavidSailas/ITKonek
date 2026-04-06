@@ -36,7 +36,6 @@ const ONLINE_TECH = [
   { id: '5', name: 'Engr. Michael Angelo Reyes', specialty: 'Data Recovery Specialist', distance: 'Consolacion', image: require('../../assets/images/technician.png') },
 ];
 
-// For the auto-scrolling Popular Services
 const SCROLL_DATA = [...SERVICE_DATA, ...SERVICE_DATA, ...SERVICE_DATA];
 
 export default function DashboardScreen() {
@@ -79,7 +78,6 @@ export default function DashboardScreen() {
     if (routes[label]) router.push(routes[label]);
   };
 
-  // Popular Services Auto-scroll logic
   useEffect(() => {
     const itemWidth = width * 0.45 + 15;
     const scrollDistance = SERVICE_DATA.length * itemWidth;
@@ -93,28 +91,35 @@ export default function DashboardScreen() {
     return () => { scrollX.removeListener(listener); animation.stop(); };
   }, []);
 
+  // --- CRITICAL STEP: FIXING FIREBASE LISTENERS ---
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
+    let unsubActive = () => {};
+    let unsubHistory = () => {};
+
+    const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
       if (user) {
+        // Fetch static user data
         getDoc(doc(db, 'users', user.uid)).then((docSnap) => {
           if (docSnap.exists()) setFullName(docSnap.data().firstName);
-        });
+        }).catch(err => console.log("User fetch error:", err));
 
+        // Listener for Active Bookings
         const qActive = query(
           collection(db, "bookings"),
           where("userId", "==", user.uid),
           where("status", "in", ["Pending", "pending", "Accepted", "On the way", "Arrived", "In Progress"])
         );
 
-        const unsubActive = onSnapshot(qActive, (snapshot) => {
+        unsubActive = onSnapshot(qActive, (snapshot) => {
           if (!snapshot.empty) {
             const docData = snapshot.docs[0].data();
             setActiveService({ id: snapshot.docs[0].id, ...docData });
           } else {
             setActiveService(null);
           }
-        });
+        }, (error) => console.log("Active snapshot error handled"));
 
+        // Listener for History
         const qHistory = query(
           collection(db, "bookings"),
           where("userId", "==", user.uid),
@@ -122,15 +127,25 @@ export default function DashboardScreen() {
           limit(5)
         );
 
-        const unsubHistory = onSnapshot(qHistory, (snapshot) => {
+        unsubHistory = onSnapshot(qHistory, (snapshot) => {
           const historyData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
           setHistory(historyData);
-        });
+        }, (error) => console.log("History snapshot error handled"));
 
-        return () => { unsubActive(); unsubHistory(); };
+      } else {
+        // If user is null (signed out), clean up local state
+        setFullName('');
+        setActiveService(null);
+        setHistory([]);
       }
     });
-    return unsubscribe;
+
+    // Final Cleanup: stop listening to everything when the component is destroyed
+    return () => {
+      unsubscribeAuth();
+      unsubActive();
+      unsubHistory();
+    };
   }, []);
 
   return (
@@ -189,7 +204,6 @@ export default function DashboardScreen() {
           ))}
         </View>
 
-        {/* RE-ADDED: Popular Services Carousel */}
         <View style={styles.sectionHeader}>
           <Text style={styles.sectionTitle}>Popular Services</Text>
           <TouchableOpacity onPress={() => router.push('/home/services/all')}>
@@ -214,7 +228,6 @@ export default function DashboardScreen() {
           ))}
         </ScrollView>
 
-        {/* Online Technicians List */}
         <View style={[styles.sectionHeader, { marginBottom: 5 }]}>
           <Text style={styles.sectionTitle}>Online Technicians</Text>
           <TouchableOpacity onPress={() => router.push('/home/techlist/page')}>
@@ -255,7 +268,6 @@ export default function DashboardScreen() {
           ))}
         </ScrollView>
 
-        {/* Recent Activity Section */}
         <View style={[styles.sectionHeader, { marginTop: 15 }]}>
           <Text style={styles.sectionTitle}>Recent Activity</Text>
         </View>

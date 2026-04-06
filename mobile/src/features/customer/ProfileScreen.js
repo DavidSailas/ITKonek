@@ -4,7 +4,7 @@ import {
   ActivityIndicator, Modal, KeyboardAvoidingView, Platform, 
   SafeAreaView, StatusBar, Alert, Pressable 
 } from 'react-native';
-import { Feather, Ionicons } from '@expo/vector-icons';
+import { Feather, Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import * as ImagePicker from 'expo-image-picker'; 
 import { auth, db } from '../../services/firebase';
@@ -27,6 +27,7 @@ export default function ProfileScreen() {
   const [passwordModal, setPasswordModal] = useState(false);
   const [modalSuccess, setModalSuccess] = useState(false);
   const [mediaModal, setMediaModal] = useState(false);
+  const [signOutModal, setSignOutModal] = useState(false); // Added for professional signout
   
   const [userData, setUserData] = useState({
     firstName: '', lastName: '', email: '', contactNumber: '',
@@ -61,8 +62,6 @@ export default function ProfileScreen() {
     } catch (e) { console.error(e); } finally { setFetching(false); }
   };
 
-  // --- PROFESSIONAL IMAGE LOGIC ---
-
   const handlePickImage = async () => {
     setMediaModal(false);
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -70,17 +69,13 @@ export default function ProfileScreen() {
       Alert.alert("Permission Denied", "Gallery access is needed to change your photo.");
       return;
     }
-
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
       aspect: [1, 1],
       quality: 0.7,
     });
-
-    if (!result.canceled) {
-      saveProfileImage(result.assets[0].uri);
-    }
+    if (!result.canceled) { saveProfileImage(result.assets[0].uri); }
   };
 
   const handleTakePhoto = async () => {
@@ -90,16 +85,12 @@ export default function ProfileScreen() {
       Alert.alert("Permission Denied", "Camera access is required to take a photo.");
       return;
     }
-
     let result = await ImagePicker.launchCameraAsync({
       allowsEditing: true,
       aspect: [1, 1],
       quality: 0.7,
     });
-
-    if (!result.canceled) {
-      saveProfileImage(result.assets[0].uri);
-    }
+    if (!result.canceled) { saveProfileImage(result.assets[0].uri); }
   };
 
   const saveProfileImage = async (uri) => {
@@ -107,31 +98,19 @@ export default function ProfileScreen() {
     try {
       const user = auth.currentUser;
       const profileRef = doc(db, "users", user.uid, "customerProfile", "profile");
-      
-      await updateDoc(profileRef, {
-        profileImage: uri,
-        updatedAt: serverTimestamp()
-      });
-
+      await updateDoc(profileRef, { profileImage: uri, updatedAt: serverTimestamp() });
       setUserData(prev => ({ ...prev, profileImage: uri }));
     } catch (e) {
       console.error(e);
       Alert.alert("Error", "Could not save photo to database.");
-    } finally {
-      setLoading(false);
-    }
+    } finally { setLoading(false); }
   };
-
-  // --- ACCOUNT LOGIC ---
 
   const handleSave = async () => {
     setLoading(true);
     const user = auth.currentUser;
     try {
-      await updateDoc(doc(db, "users", user.uid), { 
-        firstName: userData.firstName, 
-        lastName: userData.lastName 
-      });
+      await updateDoc(doc(db, "users", user.uid), { firstName: userData.firstName, lastName: userData.lastName });
       await updateDoc(doc(db, "users", user.uid, "customerProfile", "profile"), {
         contactNumber: userData.contactNumber, address: userData.address,
         city: userData.city, zipCode: userData.zipCode, gender: userData.gender,
@@ -141,28 +120,42 @@ export default function ProfileScreen() {
     } catch (e) { console.error(e); } finally { setLoading(false); }
   };
 
+  // Updated Sign Out execution logic
+  const executeSignOut = async () => {
+    setLoading(true);
+    try {
+      await auth.signOut();
+      setSignOutModal(false);
+      router.replace('/login/page');
+    } catch (error) {
+      setSignOutModal(false);
+      Alert.alert("Error", "Failed to sign out. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const onUpdatePassword = async () => {
-    if (passwords.next !== passwords.confirm) return;
+    if (passwords.next !== passwords.confirm) {
+      Alert.alert("Error", "Passwords do not match.");
+      return;
+    }
     setLoading(true);
     try {
       const user = auth.currentUser;
       const cred = EmailAuthProvider.credential(user.email, passwords.current);
       await reauthenticateWithCredential(user, cred);
       await updatePassword(user, passwords.next);
-      
       setModalSuccess(true);
       setPasswords({ current: '', next: '', confirm: '' });
-      setTimeout(() => {
-        setPasswordModal(false);
-        setModalSuccess(false);
-      }, 2200);
-    } catch (e) { setLoading(false); }
+      setTimeout(() => { setPasswordModal(false); setModalSuccess(false); }, 2200);
+    } catch (e) { 
+      Alert.alert("Auth Error", "Current password may be incorrect.");
+    } finally { setLoading(false); }
   };
 
   const renderAvatar = () => {
-    if (userData.profileImage) {
-      return <Image source={{ uri: userData.profileImage }} style={styles.avatar} />;
-    }
+    if (userData.profileImage) { return <Image source={{ uri: userData.profileImage }} style={styles.avatar} />; }
     const g = userData.gender?.toLowerCase();
     const src = g === 'male' ? avatarMale : g === 'female' ? avatarFemale : avatarNeutral;
     return <Image source={src} style={styles.avatar} />;
@@ -179,16 +172,8 @@ export default function ProfileScreen() {
           <View style={styles.profileHero}>
             <View style={styles.avatarWrapper}>
               {renderAvatar()}
-              <TouchableOpacity 
-                style={styles.editBadge} 
-                onPress={() => setMediaModal(true)}
-                activeOpacity={0.7}
-              >
-                {loading ? (
-                  <ActivityIndicator size="small" color="#FFF" />
-                ) : (
-                  <Feather name="camera" size={14} color="#FFF" />
-                )}
+              <TouchableOpacity style={styles.editBadge} onPress={() => setMediaModal(true)} activeOpacity={0.7}>
+                {loading ? <ActivityIndicator size="small" color="#FFF" /> : <Feather name="camera" size={14} color="#FFF" />}
               </TouchableOpacity>
             </View>
             <Text style={styles.userName}>{`${userData.firstName} ${userData.lastName}`}</Text>
@@ -214,7 +199,8 @@ export default function ProfileScreen() {
             <MenuOption icon="message-square" label="Technician Chat" onPress={() => router.push('/chat/page')} />
           </View>
 
-          <TouchableOpacity style={styles.logoutBtn} onPress={() => auth.signOut().then(() => router.replace('/login'))}>
+          {/* Sign out now triggers the modal instead of native alert */}
+          <TouchableOpacity style={styles.logoutBtn} onPress={() => setSignOutModal(true)}>
             <Feather name="log-out" size={18} color="#FF3B30" /><Text style={styles.logoutText}>Sign Out</Text>
           </TouchableOpacity>
           <Text style={styles.versionText}>ITKonek v1.0.6</Text>
@@ -269,38 +255,23 @@ export default function ProfileScreen() {
         </View>
       )}
 
-      {/* PROFESSIONAL PHOTO PICKER MODAL (BOTTOM SHEET) */}
-      <Modal
-        visible={mediaModal}
-        animationType="slide"
-        transparent={true}
-        onRequestClose={() => setMediaModal(false)}
-      >
-        <Pressable 
-          style={styles.modalOverlayBottom} 
-          onPress={() => setMediaModal(false)}
-        >
+      {/* PHOTO PICKER MODAL */}
+      <Modal visible={mediaModal} animationType="slide" transparent={true}>
+        <Pressable style={styles.modalOverlayBottom} onPress={() => setMediaModal(false)}>
           <View style={styles.bottomSheet}>
             <View style={styles.sheetHandle} />
             <Text style={styles.sheetTitleCenter}>Profile Photo</Text>
-            
             <View style={styles.sheetActionContainer}>
               <TouchableOpacity style={styles.sheetActionBtn} onPress={handleTakePhoto}>
                 <View style={styles.sheetActionIcon}><Feather name="camera" size={20} color="#000" /></View>
                 <Text style={styles.sheetActionText}>Take Photo</Text>
               </TouchableOpacity>
-
               <TouchableOpacity style={styles.sheetActionBtn} onPress={handlePickImage}>
                 <View style={styles.sheetActionIcon}><Feather name="image" size={20} color="#000" /></View>
                 <Text style={styles.sheetActionText}>Choose from Gallery</Text>
               </TouchableOpacity>
-
               <View style={styles.sheetDivider} />
-
-              <TouchableOpacity 
-                style={[styles.sheetActionBtn, { marginBottom: 0 }]} 
-                onPress={() => setMediaModal(false)}
-              >
+              <TouchableOpacity style={[styles.sheetActionBtn, { marginBottom: 0 }]} onPress={() => setMediaModal(false)}>
                 <View style={[styles.sheetActionIcon, { backgroundColor: '#FEE' }]}><Feather name="x" size={20} color="#FF3B30" /></View>
                 <Text style={[styles.sheetActionText, { color: '#FF3B30' }]}>Cancel</Text>
               </TouchableOpacity>
@@ -317,10 +288,7 @@ export default function ProfileScreen() {
               {!modalSuccess ? (
                 <>
                   <View style={styles.modalHeader}>
-                    <View>
-                      <Text style={styles.modalTitle}>Update Security</Text>
-                      <Text style={styles.modalSub}>Manage your login credentials</Text>
-                    </View>
+                    <View><Text style={styles.modalTitle}>Update Security</Text><Text style={styles.modalSub}>Manage credentials</Text></View>
                     <TouchableOpacity onPress={() => setPasswordModal(false)}><Feather name="x" size={20} color="#888" /></TouchableOpacity>
                   </View>
                   <InputBlock label="Current Password" password value={passwords.current} onChange={(t) => setPasswords({...passwords, current: t})} />
@@ -334,12 +302,48 @@ export default function ProfileScreen() {
                 <View style={styles.successContainer}>
                   <View style={styles.successCircle}><Ionicons name="checkmark" size={40} color="#000" /></View>
                   <Text style={styles.successTitle}>Security Updated</Text>
-                  <Text style={styles.successSub}>Your profile has been secured successfully.</Text>
                 </View>
               )}
             </View>
           </KeyboardAvoidingView>
         </View>
+      </Modal>
+
+      {/* NEW: PROFESSIONAL SIGN OUT MODAL */}
+      <Modal visible={signOutModal} animationType="slide" transparent={true}>
+        <Pressable style={styles.modalOverlayBottom} onPress={() => setSignOutModal(false)}>
+          <View style={styles.bottomSheet}>
+            <View style={styles.sheetHandle} />
+            <View style={styles.signOutHeader}>
+                <View style={styles.signOutIconContainer}>
+                    <MaterialCommunityIcons name="logout-variant" size={28} color="#FF3B30" />
+                </View>
+                <Text style={styles.signOutTitle}>Log Out of ITKonek?</Text>
+                <Text style={styles.signOutSubtitle}>You will need to re-enter your credentials to access your account again.</Text>
+            </View>
+
+            <View style={styles.signOutActionRow}>
+                <TouchableOpacity 
+                    style={styles.signOutCancelBtn} 
+                    onPress={() => setSignOutModal(false)}
+                >
+                    <Text style={styles.signOutCancelText}>Cancel</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity 
+                    style={styles.signOutConfirmBtn} 
+                    onPress={executeSignOut}
+                    disabled={loading}
+                >
+                    {loading ? (
+                        <ActivityIndicator size="small" color="#FFF" />
+                    ) : (
+                        <Text style={styles.signOutConfirmText}>Logout</Text>
+                    )}
+                </TouchableOpacity>
+            </View>
+          </View>
+        </Pressable>
       </Modal>
 
       <BottomNav activeTab="profile" />
