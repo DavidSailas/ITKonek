@@ -5,8 +5,8 @@ export function VisitorsChart() {
   return (
     <Card className="bg-background border-lines">
       <CardHeader className="flex flex-row items-center justify-between">
-        <div>
-          <CardTitle className="text-sm font-bold font-poppins uppercase tracking-wider">Total Visitors</CardTitle>
+        <div className="flex flex-col gap-2">
+          <CardTitle className="text-base font-bold font-poppins uppercase tracking-wider">Total Visitors</CardTitle>
           <p className="text-xs text-description">Total for the last 3 months</p>
         </div>
         <div className="flex border border-lines rounded-lg overflow-hidden">
