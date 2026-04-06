@@ -71,5 +71,65 @@ export const styles = StyleSheet.create({
 
   logoutBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginTop: 40, backgroundColor: '#FFF4F4', marginHorizontal: 25, padding: 20, borderRadius: 18 },
   logoutText: { color: '#FF3B30', fontWeight: '900', marginLeft: 10, fontSize: 16 },
-  versionText: { textAlign: 'center', color: '#EEE', fontSize: 12, marginTop: 30, fontWeight: '800' }
+  versionText: { textAlign: 'center', color: '#EEE', fontSize: 12, marginTop: 30, fontWeight: '800' },
+  signOutHeader: {
+    alignItems: 'center',
+    paddingVertical: 10,
+  },
+  signOutIconContainer: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    backgroundColor: '#FFF1F0',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 15,
+  },
+  signOutTitle: {
+    fontSize: 20,
+    fontWeight: '900',
+    color: '#000',
+    marginBottom: 8,
+    letterSpacing: -0.5,
+  },
+  signOutSubtitle: {
+    fontSize: 14,
+    color: '#888',
+    textAlign: 'center',
+    paddingHorizontal: 20,
+    lineHeight: 20,
+    fontWeight: '500',
+    marginBottom: 30,
+  },
+  signOutActionRow: {
+    flexDirection: 'row',
+    gap: 12,
+    paddingBottom: 10,
+  },
+  signOutCancelBtn: {
+    flex: 1,
+    paddingVertical: 16,
+    borderRadius: 14,
+    backgroundColor: '#F5F5F5',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  signOutCancelText: {
+    color: '#000',
+    fontWeight: '800',
+    fontSize: 15,
+  },
+  signOutConfirmBtn: {
+    flex: 1,
+    paddingVertical: 16,
+    borderRadius: 14,
+    backgroundColor: '#000',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  signOutConfirmText: {
+    color: '#FFF',
+    fontWeight: '800',
+    fontSize: 15,
+  },
 });
