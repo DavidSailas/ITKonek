@@ -1,133 +1,62 @@
-import { StyleSheet, Platform, StatusBar, Dimensions } from 'react-native';
+import { StyleSheet, Platform, Dimensions } from 'react-native';
 
-const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
-
-const guidelineBaseWidth = 408;
-const guidelineBaseHeight = 906;
-
-export const scale = (size) => (SCREEN_WIDTH / guidelineBaseWidth) * size;
-export const verticalScale = (size) => (SCREEN_HEIGHT / guidelineBaseHeight) * size;
-export const moderateScale = (size, factor = 0.5) => size + (scale(size) - size) * factor;
-
-// The Dynamic Status Bar Fix
-export const STATUSBAR_HEIGHT = Platform.OS === 'ios' 
-  ? (SCREEN_HEIGHT > 736 ? 44 : 20) 
-  : StatusBar.currentHeight || 0;
+const { width } = Dimensions.get('window');
 
 export default StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#FFF',
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: scale(20),
-    paddingBottom: verticalScale(12),
-    // FIXED: This ensures the header is always exactly under the time/battery bar
-    paddingTop: STATUSBAR_HEIGHT + verticalScale(8), 
-    backgroundColor: '#FFF',
-    borderBottomWidth: 1,
-    borderColor: '#F0F0F0',
-    // Professional shadow for depth
-    elevation: 3,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 2,
-    zIndex: 100,
-  },
-  headerInfo: { 
-    flex: 1, 
-    flexDirection: 'row', 
-    alignItems: 'center', 
-    marginLeft: scale(12) 
-  },
-  avatar: { 
-    width: scale(40), 
-    height: scale(40), 
-    borderRadius: scale(10), 
-    marginRight: scale(12), 
-    backgroundColor: '#EEE' 
-  },
-  userName: { 
-    fontSize: moderateScale(16), 
-    fontWeight: '800', 
-    color: '#111' 
-  },
-  statusText: { 
-    fontSize: moderateScale(11), 
-    color: '#16A34A', 
-    fontWeight: '700',
-    marginTop: 2
-  }, 
-  callIcon: { 
-    padding: scale(10), 
-    backgroundColor: '#F9F9F9', 
-    borderRadius: scale(20) 
-  },
-  listPadding: {
-    paddingHorizontal: scale(20),
-    paddingTop: verticalScale(20),
-    paddingBottom: verticalScale(20),
-  },
-  msgWrapper: { 
-    marginBottom: verticalScale(15), 
-    maxWidth: '85%' 
-  },
+  container: { flex: 1, backgroundColor: '#FFF' },
+  center: { flex: 1, justifyContent: 'center', alignItems: 'center' },
+  
+  // INBOX
+  mainHeader: { paddingTop: Platform.OS === 'ios' ? 60 : 40, paddingHorizontal: 24, paddingBottom: 20 },
+  mainTitle: { fontSize: 32, fontWeight: '900', color: '#111', letterSpacing: -1 },
+  inboxItem: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 24, paddingVertical: 18, borderBottomWidth: 1, borderColor: '#F5F5F5' },
+  inboxAvatar: { width: 50, height: 50, borderRadius: 16, backgroundColor: '#F0F0F0' },
+  inboxContent: { flex: 1, marginLeft: 16 },
+  inboxRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 },
+  inboxName: { fontSize: 16, fontWeight: '700', color: '#111' },
+  inboxStatusText: { fontSize: 10, fontWeight: '800' },
+  
+  // Messenger Style Subtext Row
+  inboxMessageRow: { flexDirection: 'row', alignItems: 'center' },
+  inboxSub: { fontSize: 14, flexShrink: 1 },
+  unreadText: { color: '#000', fontWeight: '800' }, // Bold Black if unread
+  readText: { color: '#666', fontWeight: '400' },   // #666 if read or "You:"
+  inboxTimeSmall: { fontSize: 12, color: '#999', marginLeft: 4 },
+
+  // CHAT HEADER
+  header: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 20, paddingBottom: 15, paddingTop: Platform.OS === 'ios' ? 55 : 35, borderBottomWidth: 1, borderColor: '#EEE' },
+  backCircle: { width: 40, height: 40, borderRadius: 20, justifyContent: 'center', alignItems: 'center' },
+  headerInfo: { flex: 1, marginLeft: 10 },
+  userName: { fontSize: 17, fontWeight: '800', color: '#111' },
+  statusText: { fontSize: 11, color: '#666', fontWeight: '600' },
+
+  // MESSAGES
+  listPadding: { paddingHorizontal: 20, paddingTop: 20 },
+  msgWrapper: { maxWidth: '85%' },
   msgLeft: { alignSelf: 'flex-start' },
   msgRight: { alignSelf: 'flex-end' },
-  bubble: { 
-    padding: scale(14), 
-    borderRadius: scale(20) 
-  },
-  customerBubble: { 
-    backgroundColor: '#111', 
-    borderBottomRightRadius: scale(4) 
-  },
-  engineerBubble: { 
-    backgroundColor: '#F2F2F2', 
-    borderBottomLeftRadius: scale(4) 
-  },
-  textWhite: { 
-    color: '#FFF', 
-    fontSize: moderateScale(15) 
-  },
-  textBlack: { 
-    color: '#111', 
-    fontSize: moderateScale(15) 
-  },
-  timeText: { 
-    fontSize: moderateScale(10), 
-    color: '#AAA', 
-    marginTop: verticalScale(4) 
-  },
-  inputArea: {
-    paddingHorizontal: scale(15),
-    paddingVertical: verticalScale(12),
-    backgroundColor: '#FFF',
-    borderTopWidth: 1,
-    borderColor: '#F0F0F0',
-  },
-  inputAreaWithNav: {
-    // This value ensures the text bar sits perfectly above your BottomNav
-    paddingBottom: Platform.OS === 'ios' ? verticalScale(85) : verticalScale(90), 
-  },
-  searchStyleInput: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#F5F5F5',
-    borderRadius: scale(25),
-    paddingHorizontal: scale(15),
-    height: verticalScale(52),
-  },
-  inputField: {
-    flex: 1,
-    fontSize: moderateScale(15),
-    color: '#111',
-    paddingVertical: Platform.OS === 'android' ? verticalScale(8) : 0,
-  },
-  actionBtn: {
-    marginRight: scale(10)
-  }
+  bubble: { paddingHorizontal: 16, paddingVertical: 12, borderRadius: 22 },
+  customerBubble: { backgroundColor: '#111', borderBottomRightRadius: 4 },
+  engineerBubble: { backgroundColor: '#F3F4F6', borderBottomLeftRadius: 4 },
+  textWhite: { color: '#FFF', fontSize: 15 },
+  textBlack: { color: '#111', fontSize: 15 },
+  timeText: { fontSize: 10, color: '#AAA', fontWeight: '500' },
+  seenText: { fontSize: 10, color: '#AAA', fontWeight: '700' },
+
+  // INPUT
+  inputWrapper: { paddingHorizontal: 20, paddingVertical: 15, borderTopWidth: 1, borderColor: '#EEE' },
+  inputContainer: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#F9FAFB', borderRadius: 28, paddingHorizontal: 15, paddingVertical: 8, borderWidth: 1, borderColor: '#EEE' },
+  inputField: { flex: 1, fontSize: 15, color: '#111' },
+  sendBtn: { backgroundColor: '#111', width: 38, height: 38, borderRadius: 19, justifyContent: 'center', alignItems: 'center', marginLeft: 8 },
+
+  // FINISHED STATUS
+  completionSummary: { padding: 30, alignItems: 'center', backgroundColor: '#F9FAFB', borderRadius: 24, marginVertical: 20 },
+  summaryTitle: { fontSize: 18, fontWeight: '800', color: '#111', marginTop: 15 },
+  summaryText: { fontSize: 13, color: '#666', textAlign: 'center', marginTop: 8 },
+  readOnlyWrapper: { paddingVertical: 24, alignItems: 'center', borderTopWidth: 1, borderColor: '#EEE' },
+  readOnlyText: { color: '#BBB', fontSize: 11, fontWeight: '800', letterSpacing: 1.5 },
+
+  emptyState: { flex: 1, justifyContent: 'center', alignItems: 'center', marginTop: 100 },
+  emptyIconCircle: { width: 80, height: 80, borderRadius: 40, backgroundColor: '#F9FAFB', justifyContent: 'center', alignItems: 'center', marginBottom: 20 },
+  emptyTitle: { fontSize: 16, color: '#AAA', fontWeight: '600' },
 });

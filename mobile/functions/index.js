@@ -1,44 +1,28 @@
-const functions = require("firebase-functions");
-const nodemailer = require("nodemailer");
+import * as WebBrowser from 'expo-web-browser';
+import { getFunctions, httpsCallable } from 'firebase/functions';
 
-// 1️⃣ Create transporter for Gmail
-const transporter = nodemailer.createTransport({
-  service: "gmail",
-  auth: {
-    user: "villondo.jmsoneit@gmail.com", // your Gmail
-    pass: "apmg snfq kupi nral",   // App password from Step 1
-  },
-});
-
-// 2️⃣ Send welcome email when a user signs up
-exports.sendWelcomeEmail = functions.auth.user().onCreate(async (user) => {
-  const mailOptions = {
-    from: '"ITKonek" <yourgmail@gmail.com>', // sender info
-    to: user.email,                           // new user's email
-    subject: "Welcome to ITKonek!",           // professional subject
-    html: `
-      <div style="font-family: Arial, sans-serif; line-height: 1.5; color: #333;">
-        <div style="text-align: center; margin-bottom: 20px;">
-          <img src="https://yourapp.com/logo.png" alt="ITKonek Logo" width="100"/>
-        </div>
-        <h2 style="color: #1a73e8;">Welcome to ITKonek!</h2>
-        <p>Hi ${user.displayName || ""},</p>
-        <p>Your account has been successfully created. We're excited to have you on board!</p>
-        <p>Here’s what you can do next:</p>
-        <ul>
-          <li>Explore our services</li>
-          <li>Manage your profile</li>
-          <li>Start submitting requests</li>
-        </ul>
-        <p style="margin-top: 20px;">Thank you,<br/><strong>The ITKonek Team</strong></p>
-      </div>
-    `,
-  };
+const handleLinking = async (walletType) => {
+  const functions = getFunctions();
+  const createPaymentLink = httpsCallable(functions, 'createPaymentLink');
 
   try {
-    await transporter.sendMail(mailOptions);
-    console.log("Welcome email sent to:", user.email);
+    // 1. Call your new Cloud Function
+    const result = await createPaymentLink({ 
+      amount: 100, // Testing with 100 pesos
+      type: walletType === 'Gcash' ? 'gcash' : 'paymaya' 
+    });
+
+    const { checkoutUrl } = result.data;
+
+    // 2. Open the browser for the REAL SMS OTP
+    // This is not a simulation. This is the official PayMongo/GCash page.
+    const browserResult = await WebBrowser.openAuthSessionAsync(checkoutUrl, 'exp://');
+
+    if (browserResult.type === 'success') {
+      // 3. Update your Firestore 'isGcashLinked' state here
+      Alert.alert("Verified", "Your wallet has been successfully linked!");
+    }
   } catch (error) {
-    console.error("Error sending welcome email:", error);
+    Alert.alert("Error", "Could not reach payment gateway.");
   }
-});
+};

@@ -1,100 +1,61 @@
-import { StyleSheet, Dimensions, Platform, StatusBar } from 'react-native';
+import { StyleSheet, Dimensions, Platform } from 'react-native';
 
-const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
-
-const scale = (size) => (SCREEN_WIDTH / 408) * size;
-const verticalScale = (size) => (SCREEN_HEIGHT / 906) * size;
-const moderateScale = (size, factor = 0.5) => size + (scale(size) - size) * factor;
+const { width, height } = Dimensions.get('window');
 
 export default StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#fff' },
-  mapWrapper: { ...StyleSheet.absoluteFillObject },
-  mapImage: { width: SCREEN_WIDTH, height: SCREEN_HEIGHT },
+  container: { flex: 1, backgroundColor: '#FFF' },
+  map: { flex: 1 },
+  loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center' },
 
-  /* Pins & Markers */
-  engineerMarkerContainer: { position: 'absolute', alignItems: 'center', justifyContent: 'center' },
-  markerPin: {
-    backgroundColor: '#004D4D',
-    width: scale(32),
-    height: scale(32),
-    borderRadius: scale(16),
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderWidth: 2,
-    borderColor: '#FFF',
-    elevation: 4,
-    shadowColor: '#000',
-    shadowOpacity: 0.1,
-    shadowRadius: 5,
-  },
-  markerPinActive: {
-    backgroundColor: '#111', // Professional black switch
-    width: scale(38),
-    height: scale(38),
-    borderRadius: scale(19),
-    borderColor: '#2ECC71', // Subtle green active ring
-    borderWidth: 3,
-    elevation: 10,
-  },
-  pulseRing: { position: 'absolute', width: 0, height: 0 },
-  pulseRingActive: {
-    width: scale(60),
-    height: scale(60),
-    borderRadius: scale(30),
-    backgroundColor: 'rgba(46, 204, 113, 0.15)', // Soft green glow
-  },
-  markerLabel: {
-    backgroundColor: '#FFF',
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    borderRadius: 10,
-    marginTop: 5,
-    borderWidth: 1,
-    borderColor: '#EEE',
-  },
-  markerLabelText: { fontSize: moderateScale(10), fontWeight: '800', color: '#333' },
+  userLocationContainer: { alignItems: 'center', justifyContent: 'center' },
+  userDot: { width: 14, height: 14, borderRadius: 7, backgroundColor: '#2ECC71', borderWidth: 2, borderColor: '#FFF', elevation: 5 },
+  userPulse: { position: 'absolute', width: 34, height: 34, borderRadius: 17, backgroundColor: 'rgba(46, 204, 113, 0.15)' },
+  
+  markerWrapper: { alignItems: 'center', justifyContent: 'center' },
+  markerPin: { backgroundColor: '#004D4D', width: 28, height: 28, borderRadius: 14, justifyContent: 'center', alignItems: 'center', borderWidth: 2, borderColor: '#FFF', elevation: 4 },
+  markerPinActive: { backgroundColor: '#111', borderColor: '#2ECC71', borderWidth: 3 },
 
-  /* User Location */
-  userLocation: { position: 'absolute', alignItems: 'center', justifyContent: 'center' },
-  userDot: { width: scale(16), height: scale(16), borderRadius: 8, backgroundColor: '#2ECC71', borderWidth: 3, borderColor: '#fff' },
-  userPulse: { position: 'absolute', width: scale(44), height: scale(44), borderRadius: 22, backgroundColor: 'rgba(46, 204, 113, 0.2)' },
-
-  /* Search Header */
-  overlayHeader: { position: 'absolute', top: Platform.OS === 'ios' ? verticalScale(50) : StatusBar.currentHeight + 10, width: '100%', paddingHorizontal: scale(20), zIndex: 10 },
-  searchBarContainer: { 
-    flexDirection: 'row', 
-    alignItems: 'center', 
-    backgroundColor: '#fff', 
-    borderRadius: 15, 
-    height: verticalScale(55), 
-    elevation: 8,
-    shadowColor: '#000',
-    shadowOpacity: 0.1,
-    shadowRadius: 10,
-  },
-  searchInput: { flex: 1, paddingHorizontal: 15, fontSize: moderateScale(15), color: '#111' },
+  overlayHeader: { position: 'absolute', top: Platform.OS === 'ios' ? 50 : 40, width: '100%', paddingHorizontal: 20, zIndex: 10 },
+  searchBarContainer: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#FFF', borderRadius: 15, height: 55, elevation: 10, shadowOpacity: 0.1, shadowRadius: 10 },
+  searchInput: { flex: 1, paddingHorizontal: 15, fontSize: 14, color: '#111' },
   filterBtn: { backgroundColor: '#111', padding: 10, borderRadius: 10, marginRight: 8 },
 
-  /* Floating Card */
-  quickViewContainer: { position: 'absolute', bottom: verticalScale(110), width: SCREEN_WIDTH, paddingHorizontal: scale(20), zIndex: 100 },
-  quickViewCard: {
-    flexDirection: 'row',
-    backgroundColor: '#FFF',
-    borderRadius: scale(20),
-    padding: scale(15),
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.12,
-    shadowRadius: 15,
-    elevation: 12,
-  },
-  quickAvatar: { width: scale(60), height: scale(60), borderRadius: scale(12), backgroundColor: '#F8F9FA' },
-  quickTextGroup: { flex: 1, marginLeft: scale(15) },
-  quickName: { fontSize: moderateScale(16), fontWeight: 'bold', color: '#111' },
-  quickService: { fontSize: moderateScale(13), color: '#008080', fontWeight: '600', marginVertical: 2 },
-  quickStats: { flexDirection: 'row', alignItems: 'center' },
-  quickRating: { fontSize: moderateScale(12), fontWeight: 'bold', marginLeft: 4 },
-  quickJobs: { fontSize: moderateScale(12), color: '#888', marginLeft: 5 },
-  quickAction: { backgroundColor: '#111', width: scale(40), height: scale(40), borderRadius: scale(10), justifyContent: 'center', alignItems: 'center' },
+  quickViewContainer: { position: 'absolute', bottom: 100, width: width, paddingHorizontal: 20, zIndex: 20 },
+  quickViewCard: { flexDirection: 'row', backgroundColor: '#FFF', borderRadius: 24, padding: 16, alignItems: 'center', elevation: 15, shadowOpacity: 0.1, shadowRadius: 15 },
+  quickAvatar: { width: 56, height: 56, borderRadius: 14, backgroundColor: '#F3F4F6' },
+  quickTextGroup: { flex: 1, marginLeft: 16 },
+  quickName: { fontSize: 16, fontWeight: '800', color: '#111' },
+  quickService: { fontSize: 13, color: '#004D4D', fontWeight: '700', marginTop: 2 },
+  quickStats: { flexDirection: 'row', alignItems: 'center', marginTop: 6 },
+  quickRating: { fontSize: 12, fontWeight: '800', color: '#111', marginLeft: 4 },
+  quickDistance: { fontSize: 12, color: '#6B7280', fontWeight: '700' },
+  quickAction: { backgroundColor: '#111', width: 48, height: 48, borderRadius: 14, justifyContent: 'center', alignItems: 'center' },
+
+  modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'flex-end' },
+  modalContent: { backgroundColor: '#FFF', borderTopLeftRadius: 32, borderTopRightRadius: 32, height: height * 0.75, paddingHorizontal: 24 },
+  modalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 20 },
+  closeBtn: { backgroundColor: '#F3F4F6', padding: 8, borderRadius: 12 },
+  modalTitle: { fontSize: 14, fontWeight: '800', color: '#111', textTransform: 'uppercase', letterSpacing: 1 },
+  
+  profileHero: { alignItems: 'center', marginTop: 10, marginBottom: 24 },
+  largeAvatar: { width: 100, height: 100, borderRadius: 30, backgroundColor: '#F3F4F6', marginBottom: 16 },
+  heroName: { fontSize: 24, fontWeight: '800', color: '#111' },
+  heroService: { fontSize: 14, color: '#004D4D', fontWeight: '700', marginTop: 4 },
+  
+  heroStatsRow: { flexDirection: 'row', alignItems: 'center', marginTop: 20, backgroundColor: '#F9FAFB', paddingVertical: 15, borderRadius: 20, width: '100%' },
+  heroStatItem: { flex: 1, alignItems: 'center' },
+  heroStatValue: { fontSize: 18, fontWeight: '800', color: '#111' },
+  heroStatLabel: { fontSize: 12, color: '#6B7280', marginTop: 2 },
+  statDivider: { width: 1, height: 30, backgroundColor: '#E5E7EB' },
+
+  sectionContainer: { marginBottom: 24 },
+  sectionTitle: { fontSize: 16, fontWeight: '800', color: '#111', marginBottom: 10 },
+  sectionText: { fontSize: 14, color: '#4B5563', lineHeight: 22 },
+  
+  skillsGrid: { flexDirection: 'row', flexWrap: 'wrap' },
+  skillTag: { backgroundColor: '#F3F4F6', paddingHorizontal: 12, paddingVertical: 8, borderRadius: 10, marginRight: 8, marginBottom: 8 },
+  skillTagText: { fontSize: 12, fontWeight: '700', color: '#374151' },
+  
+  bookActionBtn: { backgroundColor: '#111', height: 60, borderRadius: 18, justifyContent: 'center', alignItems: 'center', marginTop: 10, marginBottom: 40 },
+  bookActionText: { color: '#FFF', fontSize: 16, fontWeight: '800' }
 });

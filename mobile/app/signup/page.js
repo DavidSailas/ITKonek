@@ -1,6 +1,5 @@
-import React from 'react';
-import SignUpScreen from '../../src/features/auth/SignUpScreen';
+import CustomerSignUpScreen from '../../src/features/auth/CustomerSignUpScreen';
 
 export default function Page() {
-  return <SignUpScreen />;
+  return <CustomerSignUpScreen />;
 }
