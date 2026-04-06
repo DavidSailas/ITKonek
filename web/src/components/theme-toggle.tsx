@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button"
 import { useEffect, useState } from "react"
 
 export function ThemeToggle() {
+  
   const [isDark, setIsDark] = useState(true)
 
   useEffect(() => {
@@ -19,12 +20,12 @@ export function ThemeToggle() {
       variant="ghost"
       size="icon"
       onClick={() => setIsDark(!isDark)}
-      className="rounded-full w-10 h-10 border border-zinc-800 dark:text-zinc-400 text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+      className="rounded-xl w-10 h-10 border border-lines text-description hover:bg-tint/5 hover:text-foreground transition-all active:scale-95"
     >
       {isDark ? (
-        <Moon className="h-5 w-5 transition-all" />
+        <Moon className="h-5 w-5 transition-transform rotate-0 scale-100" />
       ) : (
-        <Sun className="h-5 w-5 transition-all" />
+        <Sun className="h-5 w-5 transition-transform rotate-0 scale-100" />
       )}
       <span className="sr-only">Toggle theme</span>
     </Button>
