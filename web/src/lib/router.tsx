@@ -1,8 +1,9 @@
 import { createBrowserRouter, Navigate } from 'react-router-dom';
 import LoginPage from '@/pages/auth/LoginPage';
 import DashboardLayout from '@/components/layouts/DashboardLayout';
-import DashboardPage from '@/pages/dashboard/DashboardPage';
 import { ProtectedRoute } from '@/features/auth/components/ProtectedRoute';
+import DashboardPage from '@/pages/dashboard/DashboardPage';
+import BookingsPage from '@/pages/dashboard/BookingsPage';
 
 export const router = createBrowserRouter([
   {
@@ -25,7 +26,7 @@ export const router = createBrowserRouter([
           },
           {
             path: "bookings",
-            element: <div>Bookings Screen</div>,
+            element: <BookingsPage />,
           },
           {
             path: "pros",
