@@ -15,6 +15,7 @@
     --color-btn-text: var(--btn-text);
     --color-description: var(--description);
     --color-lines: var(--lines);
+    --color-logo-color: var(--logo-color);
 
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
@@ -60,6 +61,7 @@
 
   --tint: rgb(0, 0, 0);
   --btn: rgb(0, 0, 0);
+  --logo-color: #000000; 
   --btn-text: #FFFFFF;
   --description: #888888;
   --text: #000000;
@@ -102,7 +104,7 @@
 
 .dark {
   --tint: rgb(255, 255, 255);
-  --white: #FFFFFF;
+  --logo-color: #000000; 
   --btn: #FFFFFF;
   --btn-text: #000000;
   --description: #FFF9F4;

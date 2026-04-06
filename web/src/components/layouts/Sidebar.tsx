@@ -43,8 +43,8 @@ export const Sidebar = ({ role }: SidebarProps) => {
     <aside className="w-64 h-screen bg-background text-foreground flex flex-col border-r border-lines sticky top-0 transition-colors duration-300">
       <div className="p-6 mb-4">
         <div className="flex items-center gap-3">
-        
-          <div className="w-9 h-9 bg-tint rounded-xl flex items-center justify-center text-white font-bold shadow-lg shadow-tint/20 transition-transform hover:scale-105">
+      {/* Branding */}
+          <div className="w-9 h-9 bg-tint rounded-xl flex items-center justify-center text-btn-text font-bold shadow-lg shadow-tint/20 transition-transform hover:scale-105">
             IK
           </div>
           <div>
