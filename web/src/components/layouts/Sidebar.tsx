@@ -11,20 +11,27 @@ import {
 } from 'lucide-react';
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/context/AuthContext";
+import { auth } from "@/lib/firebase";
+import { signOut } from "firebase/auth";
 
-interface SidebarProps {
-  role: 'admin' | 'superadmin';
-}
-
-export const Sidebar = ({ role }: SidebarProps) => {
+export const Sidebar = () => {
+  const { role, details } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
-  const handleLogout = () => {
-    console.log("Logging out...");
-    navigate("/", { replace: true });
+
+  // To do: Make a this as a file at features/auth/hooks
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+      navigate("/", { replace: true });
+    } catch (error) {
+      console.error("Error logging out:", error);
+    }
   };
 
+  // To do: Make this into a collection
   const menuItems = [
     { name: 'Dashboard', icon: LayoutDashboard, path: '/dashboard' },
     { name: 'Bookings', icon: CalendarCheck, path: '/dashboard/bookings' },
@@ -39,22 +46,34 @@ export const Sidebar = ({ role }: SidebarProps) => {
     { name: 'Support Tickets', icon: MessageSquare, path: '/dashboard/support' },
   ];
 
+  // Temporary: Get Initials
+  const getInitials = () => {
+    if (!details?.firstName) return role?.[0]?.toUpperCase() || "A";
+
+    const names = details.firstName.trim().split(" ");
+
+    if (names.length > 1) {
+      return (names[0][0] + names[1][0]).toUpperCase();
+    }
+
+    return names[0][0].toUpperCase();
+  };
+
+
   return (
     <aside className="w-64 h-screen bg-background text-foreground flex flex-col border-r border-lines sticky top-0 transition-colors duration-300">
       <div className="p-6 mb-4">
         <div className="flex items-center gap-3">
-      {/* Branding */}
           <div className="w-9 h-9 bg-tint rounded-xl flex items-center justify-center text-btn-text font-bold shadow-lg shadow-tint/20 transition-transform hover:scale-105">
-            IK
+            {getInitials()}
           </div>
           <div>
-            <h1 className="text-lg font-bold tracking-tight leading-none font-poppins">ITKonek</h1>
-            <p className="text-[10px] text-tint font-bold tracking-widest uppercase mt-1">Admin Panel</p>
+            <h1 className="text-xs font-semibold leading-none font-poppins">{details?.firstName || role}</h1>
+            <p className="text-[8px] text-tint font-bold tracking-widest uppercase mt-1">{role} Panel</p>
           </div>
         </div>
       </div>
 
-      {/* Navigation */}
       <nav className="flex-1 px-4 space-y-1 overflow-y-auto">
         <p className="px-4 text-[10px] font-bold uppercase tracking-widest text-description mb-3 opacity-70">Overview</p>
 
@@ -102,7 +121,6 @@ export const Sidebar = ({ role }: SidebarProps) => {
         )}
       </nav>
 
-      {/* Logout */}
       <div className="p-4 border-t border-lines mt-auto">
         <button
           onClick={handleLogout}

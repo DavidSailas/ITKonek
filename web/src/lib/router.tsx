@@ -2,6 +2,7 @@ import { createBrowserRouter, Navigate } from 'react-router-dom';
 import LoginPage from '@/pages/auth/LoginPage';
 import DashboardLayout from '@/components/layouts/DashboardLayout';
 import DashboardPage from '@/pages/dashboard/DashboardPage';
+import { ProtectedRoute } from '@/features/auth/components/ProtectedRoute';
 
 export const router = createBrowserRouter([
   {
@@ -10,42 +11,54 @@ export const router = createBrowserRouter([
   },
   {
     path: "/dashboard",
-    element: <DashboardLayout />,
+    
+    // GUARD 1: Protect All Path
+    element: <ProtectedRoute allowedRoles={['admin', 'superadmin']} />,
     children: [
       {
-        index: true, 
-        element: <DashboardPage />,
-      },
-      {
-        path: "bookings",
-        element: <div>Bookings Screen</div>,
-      },
-      {
-        path: "pros",
-        element: <div>IT Professionals</div>,
-      },
-      {
-        path: "customers",
-        element: <div>Customers</div>,
-      },
-      {
-        path: "services",
-        element: <div>Services</div>,
-      },
 
-      // Super Admin
+        element: <DashboardLayout />,
+        children: [
+          {
+            index: true,
+            element: <DashboardPage />,
+          },
+          {
+            path: "bookings",
+            element: <div>Bookings Screen</div>,
+          },
+          {
+            path: "pros",
+            element: <div>IT Professionals</div>,
+          },
+          {
+            path: "customers",
+            element: <div>Customers</div>,
+          },
+          {
+            path: "services",
+            element: <div>Services</div>,
+          },
 
-      {
-        path: "finance",
-        element: <div>Revenue & Payouts</div>,
-      },
-      {
-        path: "analytics",
-        element: <div>Platform Analytics</div>,
-      },
-      {
-        path: "support",
-        element: <div>Support Tickets</div>,
+          // GUARD 2: Nested Super Admin Routes
+          {
+            element: <ProtectedRoute allowedRoles={['superadmin']} />,
+            children: [
+              {
+                path: "finance",
+                element: <div>Revenue & Payouts</div>,
+              },
+              {
+                path: "analytics",
+                element: <div>Platform Analytics</div>,
+              },
+              {
+                path: "support",
+                element: <div>Support Tickets</div>,
+              },
+            ],
+          },
+        ],
       },
     ],
   },

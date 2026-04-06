@@ -2,6 +2,9 @@ import { Moon, Sun } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useEffect, useState } from "react"
 
+
+// To do: Transform this into a Global Context
+
 export function ThemeToggle() {
   
   const [isDark, setIsDark] = useState(true)
