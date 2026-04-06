@@ -9,7 +9,7 @@ import {
   MessageSquare,
   BarChart3
 } from 'lucide-react';
-import { Link, useNavigate, useLocation } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/context/AuthContext";
 import { useLogout } from '@/features/auth/hooks/use-logout';
@@ -18,7 +18,6 @@ import { useLogout } from '@/features/auth/hooks/use-logout';
 export const Sidebar = () => {
   const { role, details } = useAuth();
   const { logout, isLoggingOut } = useLogout();
-  const navigate = useNavigate();
   const location = useLocation();
 
   // To do: Make this into a collection
