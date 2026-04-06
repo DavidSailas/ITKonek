@@ -12,24 +12,14 @@ import {
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/context/AuthContext";
-import { auth } from "@/lib/firebase";
-import { signOut } from "firebase/auth";
+import { useLogout } from '@/features/auth/hooks/use-logout';
+
 
 export const Sidebar = () => {
   const { role, details } = useAuth();
+  const { logout, isLoggingOut } = useLogout();
   const navigate = useNavigate();
   const location = useLocation();
-
-
-  // To do: Make a this as a file at features/auth/hooks
-  const handleLogout = async () => {
-    try {
-      await signOut(auth);
-      navigate("/", { replace: true });
-    } catch (error) {
-      console.error("Error logging out:", error);
-    }
-  };
 
   // To do: Make this into a collection
   const menuItems = [
@@ -123,11 +113,14 @@ export const Sidebar = () => {
 
       <div className="p-4 border-t border-lines mt-auto">
         <button
-          onClick={handleLogout}
-          className="flex items-center gap-3 px-4 py-3 text-description hover:bg-destructive/10 hover:text-destructive w-full rounded-xl transition-all group text-left outline-none font-poppins"
+          onClick={logout}
+          disabled={isLoggingOut}
+          className="flex items-center gap-3 px-4 py-3 text-description hover:bg-destructive/10 hover:text-destructive disabled:opacity-50 w-full rounded-xl transition-all group text-left outline-none font-poppins"
         >
-          <LogOut size={20} className="group-hover:-translate-x-1 transition-transform" />
-          <span className="text-sm font-medium">Logout</span>
+          <LogOut size={20} className={cn("group-hover:-translate-x-1 transition-transform", isLoggingOut && "animate-pulse")} />
+          <span className="text-sm font-medium">
+            {isLoggingOut ? "Logging out..." : "Logout"}
+          </span>
         </button>
       </div>
     </aside>
