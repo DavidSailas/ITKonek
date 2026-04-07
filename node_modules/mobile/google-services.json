@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "923030827484",
+    "project_id": "jms-one-it",
+    "storage_bucket": "jms-one-it.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:923030827484:android:1dffe05a697af5cb309f19",
+        "android_client_info": {
+          "package_name": "com.anonymous.itkonek"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "923030827484-bgv1aoffh3qem02jin6r4664nhjh4ssf.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.anonymous.itkonek",
+            "certificate_hash": "8f6131e91c1e1460448f15f3aa329205518c5b52"
+          }
+        },
+        {
+          "client_id": "923030827484-s2h03dec2pcht46teg4epo1g3pvldq3r.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAjobxzGaLZXe9EIlT3ILoARHxyi6EDDJc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "923030827484-s2h03dec2pcht46teg4epo1g3pvldq3r.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
