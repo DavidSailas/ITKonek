@@ -101,7 +101,7 @@ export default function LoginScreen() {
       if (userData.role === 'customer') {
         router.replace('/home/page');
       } else if (userData.role === 'engineer') {
-        router.replace('/engineer-home/page');
+        router.replace('/workspace/page');
       }
     } catch (err) {
       const friendlyMsg = getFriendlyErrorMessage(err.code);

@@ -2,20 +2,25 @@ import React, { useState } from 'react';
 import {
   View, Text, TextInput, TouchableOpacity, Image, ImageBackground,
   ScrollView, KeyboardAvoidingView, Platform, ActivityIndicator,
-  Keyboard, TouchableWithoutFeedback, StyleSheet, Alert
+  Keyboard, TouchableWithoutFeedback, StyleSheet, Modal
 } from 'react-native';
-import { Ionicons, MaterialIcons, FontAwesome } from '@expo/vector-icons';
+import { Ionicons, MaterialIcons, Feather } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import * as ImagePicker from 'expo-image-picker';
+import * as Clipboard from 'expo-clipboard';
 import styles from './SignUpScreen.styles';
 
-import { doc, setDoc } from 'firebase/firestore';
-import { db } from '../../services/firebase';
+// Firebase Imports
+import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
+import { createUserWithEmailAndPassword, signOut } from 'firebase/auth';
+import { db, auth } from '../../services/firebase'; 
 
 export default function EngineerSignUpScreen() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [generatedPass, setGeneratedPass] = useState('');
+  const [copied, setCopied] = useState(false);
 
   const [form, setForm] = useState({
     firstName: '',
@@ -35,17 +40,29 @@ export default function EngineerSignUpScreen() {
   const [securityChecked, setSecurityChecked] = useState(false);
   const [error, setError] = useState({ general: '' });
 
+  const generatePassword = () => {
+    const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%";
+    let retVal = "";
+    for (let i = 0; i < 10; ++i) {
+      retVal += charset.charAt(Math.floor(Math.random() * charset.length));
+    }
+    return retVal;
+  };
+
+  const copyToClipboard = async () => {
+    await Clipboard.setStringAsync(generatedPass);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
   const pickImage = async (key) => {
     const { status } = await ImagePicker.requestCameraPermissionsAsync();
-    if (status !== 'granted') {
-      Alert.alert("Access Denied", "We need camera access to verify your identity.");
-      return;
-    }
+    if (status !== 'granted') return;
 
     let result = await ImagePicker.launchCameraAsync({
       allowsEditing: true,
       aspect: [1, 1],
-      quality: 0.7,
+      quality: 0.4, // Reduced quality slightly for faster Firestore writes
     });
 
     if (!result.canceled) {
@@ -80,20 +97,54 @@ export default function EngineerSignUpScreen() {
     if (Object.keys(tempError).length > 1 || tempError.general) return;
 
     setLoading(true);
+    const password = generatePassword();
+    setGeneratedPass(password);
+
     try {
-      const applicationRef = doc(db, 'engineer_applications', form.email);
-      await setDoc(applicationRef, {
-        ...form,
-        specializations: selectedSpecs,
-        status: 'pending_approval',
-        appliedAt: new Date(),
-        role: 'engineer'
+      // 1. Create Auth User
+      const userCredential = await createUserWithEmailAndPassword(auth, form.email, password);
+      const user = userCredential.user;
+
+      // 2. Main User Doc
+      await setDoc(doc(db, 'users', user.uid), {
+        firstName: form.firstName,
+        lastName: form.lastName,
+        email: form.email,
+        contact: form.contact,
+        role: 'engineer',
+        roleId: 'QsTPKDSom1VWm4WiPSWe',
+        status: 'Active',
+        isOnline: false,
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp(),
       });
 
-      setSuccess(true);
-      setTimeout(() => router.push('/login/page'), 3000);
+      // 3. Sub-collection details
+      await setDoc(doc(db, 'users', user.uid, 'engineerProfile', 'details'), {
+        address: form.address,
+        primaryRole: form.primaryRole,
+        specializations: selectedSpecs,
+        idPhoto: form.idPhoto,
+        userPhoto: form.userPhoto,
+        verificationStatus: 'pending_approval',
+        updatedAt: serverTimestamp(),
+      });
+
+      // Success!
+      setShowSuccessModal(true);
+      
+      // Clear session so they have to login with the generated password
+      await signOut(auth);
+
     } catch (err) {
-      setError({ general: 'Failed to submit application. Please check your connection.' });
+      console.error("Signup Error Details:", err);
+      if (err.code === 'auth/email-already-in-use') {
+        setError({ general: 'This email is already registered.' });
+      } else if (err.code === 'permission-denied') {
+        setError({ general: 'Database permission error. Check security rules.' });
+      } else {
+        setError({ general: 'Registration failed. Please check your connection.' });
+      }
     } finally {
       setLoading(false);
     }
@@ -190,14 +241,7 @@ export default function EngineerSignUpScreen() {
                   </View>
                 ) : null}
 
-                {success ? (
-                  <View style={styles.successBox}>
-                    <Ionicons name="checkmark-circle" size={18} color="#059669" />
-                    <Text style={styles.successText}>Application Sent! We'll be in touch.</Text>
-                  </View>
-                ) : null}
-
-                <TouchableOpacity style={[styles.signUpBtn, (loading || success) && {opacity: 0.7}]} onPress={handleEngineerSubmit} disabled={loading || success}>
+                <TouchableOpacity style={[styles.signUpBtn, loading && {opacity: 0.7}]} onPress={handleEngineerSubmit} disabled={loading}>
                   {loading ? <ActivityIndicator color="#fff" /> : <Text style={styles.signUpText}>Submit Application</Text>}
                 </TouchableOpacity>
 
@@ -209,6 +253,48 @@ export default function EngineerSignUpScreen() {
           </TouchableWithoutFeedback>
         </ScrollView>
       </KeyboardAvoidingView>
+
+      <Modal visible={showSuccessModal} transparent animationType="fade">
+        <View style={localStyles.modalOverlay}>
+          <View style={localStyles.modalContent}>
+            <View style={localStyles.successHeader}>
+               <View style={localStyles.iconCircle}>
+                  <Ionicons name="shield-checkmark" size={40} color="#000" />
+               </View>
+               <Text style={localStyles.modalTitle}>Application Received</Text>
+               <Text style={localStyles.modalSub}>Engineer credentials have been generated.</Text>
+            </View>
+
+            <View style={localStyles.passContainer}>
+               <Text style={localStyles.passLabel}>TEMPORARY ACCESS KEY</Text>
+               <View style={localStyles.passBox}>
+                  <Text style={localStyles.passText}>{generatedPass}</Text>
+                  <TouchableOpacity onPress={copyToClipboard} style={localStyles.copyBtn}>
+                    <Feather name={copied ? "check" : "copy"} size={18} color={copied ? "#4CAF50" : "#666"} />
+                  </TouchableOpacity>
+               </View>
+               {copied && <Text style={localStyles.copiedText}>Copied to clipboard!</Text>}
+            </View>
+
+            <View style={localStyles.instructions}>
+               <Text style={localStyles.instructionHeader}>Next Steps:</Text>
+               <View style={localStyles.step}><Text style={localStyles.stepText}>• Use your email and the key above to login.</Text></View>
+               <View style={localStyles.step}><Text style={localStyles.stepText}>• Complete your profile verification inside.</Text></View>
+            </View>
+
+            <TouchableOpacity 
+              style={localStyles.finishBtn} 
+              onPress={() => {
+                setShowSuccessModal(false);
+                router.push('/login/page');
+              }}
+            >
+              <Text style={localStyles.finishBtnText}>Go to Login</Text>
+              <Ionicons name="arrow-forward" size={18} color="#FFF" />
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </ImageBackground>
   );
 }
@@ -223,5 +309,23 @@ const localStyles = StyleSheet.create({
   chipActive: { backgroundColor: '#000', borderColor: '#000' },
   chipActiveMulti: { backgroundColor: '#333', borderColor: '#333' },
   chipText: { fontSize: 13, color: '#666', fontWeight: '500' },
-  chipTextActive: { color: '#FFF', fontWeight: 'bold' }
+  chipTextActive: { color: '#FFF', fontWeight: 'bold' },
+  modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.7)', justifyContent: 'center', alignItems: 'center', padding: 25 },
+  modalContent: { backgroundColor: '#FFF', width: '100%', borderRadius: 30, padding: 30, alignItems: 'center' },
+  successHeader: { alignItems: 'center', marginBottom: 25 },
+  iconCircle: { width: 80, height: 80, borderRadius: 40, backgroundColor: '#F5F5F5', justifyContent: 'center', alignItems: 'center', marginBottom: 15 },
+  modalTitle: { fontSize: 22, fontWeight: '900', color: '#111', textAlign: 'center' },
+  modalSub: { fontSize: 14, color: '#666', textAlign: 'center', marginTop: 5 },
+  passContainer: { width: '100%', marginBottom: 25 },
+  passLabel: { fontSize: 10, fontWeight: '900', color: '#AAA', marginBottom: 8, letterSpacing: 1, textAlign: 'center' },
+  passBox: { flexDirection: 'row', backgroundColor: '#F9F9F9', borderWidth: 1, borderColor: '#EEE', borderRadius: 15, paddingHorizontal: 20, paddingVertical: 18, alignItems: 'center', justifyContent: 'space-between' },
+  passText: { fontSize: 18, fontWeight: 'bold', color: '#000', letterSpacing: 1.5 },
+  copyBtn: { padding: 5 },
+  copiedText: { fontSize: 11, color: '#4CAF50', fontWeight: '700', marginTop: 8, textAlign: 'center' },
+  instructions: { width: '100%', backgroundColor: '#FAFAFA', padding: 15, borderRadius: 15, marginBottom: 25 },
+  instructionHeader: { fontSize: 12, fontWeight: '800', color: '#333', marginBottom: 8 },
+  step: { marginBottom: 4 },
+  stepText: { fontSize: 12, color: '#666', lineHeight: 18 },
+  finishBtn: { backgroundColor: '#000', width: '100%', height: 60, borderRadius: 18, flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: 10 },
+  finishBtnText: { color: '#FFF', fontSize: 16, fontWeight: 'bold' }
 });

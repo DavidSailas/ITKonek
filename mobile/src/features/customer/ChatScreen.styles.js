@@ -16,11 +16,10 @@ export default StyleSheet.create({
   inboxName: { fontSize: 16, fontWeight: '700', color: '#111' },
   inboxStatusText: { fontSize: 10, fontWeight: '800' },
   
-  // Messenger Style Subtext Row
   inboxMessageRow: { flexDirection: 'row', alignItems: 'center' },
   inboxSub: { fontSize: 14, flexShrink: 1 },
-  unreadText: { color: '#000', fontWeight: '800' }, // Bold Black if unread
-  readText: { color: '#666', fontWeight: '400' },   // #666 if read or "You:"
+  unreadText: { color: '#000', fontWeight: '800' }, 
+  readText: { color: '#666', fontWeight: '400' },   
   inboxTimeSmall: { fontSize: 12, color: '#999', marginLeft: 4 },
 
   // CHAT HEADER
@@ -29,6 +28,16 @@ export default StyleSheet.create({
   headerInfo: { flex: 1, marginLeft: 10 },
   userName: { fontSize: 17, fontWeight: '800', color: '#111' },
   statusText: { fontSize: 11, color: '#666', fontWeight: '600' },
+
+  // EMPTY STATE (PROFESSIONAL & REALISTIC)
+  emptyContainer: { flex: 1, paddingHorizontal: 50, justifyContent: 'center', alignItems: 'center', marginBottom: 100 },
+  emptyIllustration: { width: 120, height: 120, justifyContent: 'center', alignItems: 'center', marginBottom: 25 },
+  emptyCircleLarge: { position: 'absolute', width: 100, height: 100, borderRadius: 50, backgroundColor: '#F9FAFB' },
+  emptyCircleSmall: { position: 'absolute', width: 60, height: 60, borderRadius: 30, backgroundColor: '#F3F4F6', top: 10, right: 0 },
+  emptyHeading: { fontSize: 20, fontWeight: '800', color: '#111', marginBottom: 10, textAlign: 'center' },
+  emptyDescription: { fontSize: 14, color: '#9CA3AF', textAlign: 'center', lineHeight: 22, marginBottom: 30 },
+  emptyButton: { backgroundColor: '#111', paddingHorizontal: 24, paddingVertical: 12, borderRadius: 12 },
+  emptyButtonText: { color: '#FFF', fontSize: 14, fontWeight: '700' },
 
   // MESSAGES
   listPadding: { paddingHorizontal: 20, paddingTop: 20 },
@@ -55,8 +64,4 @@ export default StyleSheet.create({
   summaryText: { fontSize: 13, color: '#666', textAlign: 'center', marginTop: 8 },
   readOnlyWrapper: { paddingVertical: 24, alignItems: 'center', borderTopWidth: 1, borderColor: '#EEE' },
   readOnlyText: { color: '#BBB', fontSize: 11, fontWeight: '800', letterSpacing: 1.5 },
-
-  emptyState: { flex: 1, justifyContent: 'center', alignItems: 'center', marginTop: 100 },
-  emptyIconCircle: { width: 80, height: 80, borderRadius: 40, backgroundColor: '#F9FAFB', justifyContent: 'center', alignItems: 'center', marginBottom: 20 },
-  emptyTitle: { fontSize: 16, color: '#AAA', fontWeight: '600' },
 });

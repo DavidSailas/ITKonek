@@ -2,7 +2,6 @@ import { StyleSheet, Dimensions, Platform } from 'react-native';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
-// Base dimensions from your phone
 const guidelineBaseWidth = 408;
 const guidelineBaseHeight = 906;
 
@@ -15,36 +14,37 @@ export default StyleSheet.create({
     position: 'absolute',
     bottom: 0,
     width: SCREEN_WIDTH,
-    // Higher container to account for the "popping" active circle
-    height: verticalScale(100), 
-    justifyContent: 'flex-end',
+    height: verticalScale(100),
     backgroundColor: 'transparent',
+    justifyContent: 'flex-end',
   },
 
   contentHolder: {
     flexDirection: 'row',
-    width: SCREEN_WIDTH,
-    // Add extra padding at bottom for iPhone "notches" (Safe Area)
-    height: Platform.OS === 'ios' ? verticalScale(85) : verticalScale(70),
+    width: SCREEN_WIDTH, // Strictly use the screen width
+    height: Platform.OS === 'ios' ? verticalScale(85) : verticalScale(75),
     backgroundColor: '#1A1A1A',
     alignItems: 'center',
-    justifyContent: 'space-around',
+    // 'space-evenly' ensures Home and Profile aren't pushed against the screen edges
+    justifyContent: 'space-evenly', 
+    paddingHorizontal: scale(5), // Small buffer so icons don't touch the very edge
     paddingBottom: Platform.OS === 'ios' ? verticalScale(20) : verticalScale(5),
   },
 
   iconWrapper: {
+    // We use a percentage-based width to ensure 5 items always fit (100 / 5 = 20)
+    width: SCREEN_WIDTH / 5.2, 
     alignItems: 'center',
     justifyContent: 'center',
-    width: SCREEN_WIDTH / 4,
+    height: '100%',
   },
 
   activeCircle: {
     position: 'absolute',
-    // Moves the circle up proportionally
-    top: verticalScale(-30),
-    width: scale(60),
-    height: scale(60),
-    borderRadius: scale(30),
+    top: verticalScale(-25),
+    width: scale(50), // Reduced from 54 to 50 for better 5-tab fit
+    height: scale(50),
+    borderRadius: scale(25),
     backgroundColor: '#fff',
     justifyContent: 'center',
     alignItems: 'center',
@@ -57,16 +57,17 @@ export default StyleSheet.create({
   },
 
   label: {
-    fontSize: moderateScale(11),
-    color: '#fff',
-    fontWeight: '600',
-    // Ensures the label stays below the circle
-    marginTop: verticalScale(40),
+    fontSize: moderateScale(8.5), // Slightly smaller font
+    fontWeight: '700',
+    marginTop: verticalScale(35),
+    textAlign: 'center',
+    width: '100%',
   },
 
   inactiveLabel: {
-    fontSize: moderateScale(11),
-    color: '#aaa',
+    fontSize: moderateScale(8.5),
     marginTop: verticalScale(4),
+    textAlign: 'center',
+    width: '100%',
   },
 });

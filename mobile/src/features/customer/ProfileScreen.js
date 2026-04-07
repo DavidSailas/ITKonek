@@ -8,8 +8,8 @@ import { Feather, Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import * as ImagePicker from 'expo-image-picker'; 
 import { auth, db } from '../../services/firebase';
-import { doc, getDoc, updateDoc, serverTimestamp } from 'firebase/firestore';
-import { updatePassword, EmailAuthProvider, reauthenticateWithCredential } from 'firebase/auth';
+import { doc, getDoc, updateDoc, serverTimestamp, onSnapshot } from 'firebase/firestore';
+import { updatePassword, EmailAuthProvider, reauthenticateWithCredential, onAuthStateChanged } from 'firebase/auth';
 import BottomNav from '../../components/BottomNav';
 import { styles } from './ProfileScreen.styles';
 
@@ -27,7 +27,7 @@ export default function ProfileScreen() {
   const [passwordModal, setPasswordModal] = useState(false);
   const [modalSuccess, setModalSuccess] = useState(false);
   const [mediaModal, setMediaModal] = useState(false);
-  const [signOutModal, setSignOutModal] = useState(false); // Added for professional signout
+  const [signOutModal, setSignOutModal] = useState(false); 
   
   const [userData, setUserData] = useState({
     firstName: '', lastName: '', email: '', contactNumber: '',
@@ -37,14 +37,26 @@ export default function ProfileScreen() {
 
   const [passwords, setPasswords] = useState({ current: '', next: '', confirm: '' });
 
-  useEffect(() => { fetchUserData(); }, []);
+  useEffect(() => {
+    // 1. Listen for Auth Changes to handle cleanup safely
+    const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        fetchUserData(user.uid);
+      } else {
+        // If user is gone, stop loading and clear data
+        setFetching(false);
+        setUserData({ firstName: '', lastName: '', email: '' });
+      }
+    });
 
-  const fetchUserData = async () => {
-    const user = auth.currentUser;
-    if (!user) return;
+    return () => unsubscribeAuth(); // Cleanup auth listener on unmount
+  }, []);
+
+  const fetchUserData = async (uid) => {
     try {
-      const userRef = doc(db, "users", user.uid);
-      const profileRef = doc(db, "users", user.uid, "customerProfile", "profile");
+      const userRef = doc(db, "users", uid);
+      const profileRef = doc(db, "users", uid, "customerProfile", "profile");
+      
       const [uSnap, pSnap] = await Promise.all([getDoc(userRef), getDoc(profileRef)]);
       
       if (uSnap.exists()) {
@@ -52,14 +64,37 @@ export default function ProfileScreen() {
         const p = pSnap.exists() ? pSnap.data() : {};
         setUserData({
           firstName: u.firstName || '', lastName: u.lastName || '',
-          email: u.email || user.email, role: u.role || 'customer',
+          email: u.email || auth.currentUser?.email, role: u.role || 'customer',
           contactNumber: p.contactNumber || '', address: p.address || '', 
           city: p.city || '', zipCode: p.zipCode || '',
           dateOfBirth: p.dateOfBirth || '', gender: p.gender || '', 
           profileImage: p.profileImage || null
         });
       }
-    } catch (e) { console.error(e); } finally { setFetching(false); }
+    } catch (e) { 
+      console.error("Fetch Error:", e); 
+    } finally { 
+      setFetching(false); 
+    }
+  };
+
+  const executeSignOut = async () => {
+    setLoading(true);
+    try {
+      setSignOutModal(false);
+      // We clear the state immediately before signing out to stop re-renders
+      setUserData({ firstName: '', lastName: '', email: '' }); 
+
+      await auth.signOut();
+      
+      // Use replace to ensure the user cannot go "back" into a protected screen
+      router.replace('/login/page');
+    } catch (error) {
+      console.error("Sign out error:", error);
+      Alert.alert("Error", "Failed to sign out. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handlePickImage = async () => {
@@ -97,18 +132,20 @@ export default function ProfileScreen() {
     setLoading(true);
     try {
       const user = auth.currentUser;
+      if (!user) return;
       const profileRef = doc(db, "users", user.uid, "customerProfile", "profile");
       await updateDoc(profileRef, { profileImage: uri, updatedAt: serverTimestamp() });
       setUserData(prev => ({ ...prev, profileImage: uri }));
     } catch (e) {
       console.error(e);
-      Alert.alert("Error", "Could not save photo to database.");
+      Alert.alert("Error", "Could not save photo.");
     } finally { setLoading(false); }
   };
 
   const handleSave = async () => {
     setLoading(true);
     const user = auth.currentUser;
+    if (!user) return;
     try {
       await updateDoc(doc(db, "users", user.uid), { firstName: userData.firstName, lastName: userData.lastName });
       await updateDoc(doc(db, "users", user.uid, "customerProfile", "profile"), {
@@ -118,21 +155,6 @@ export default function ProfileScreen() {
       });
       setView('main');
     } catch (e) { console.error(e); } finally { setLoading(false); }
-  };
-
-  // Updated Sign Out execution logic
-  const executeSignOut = async () => {
-    setLoading(true);
-    try {
-      await auth.signOut();
-      setSignOutModal(false);
-      router.replace('/login/page');
-    } catch (error) {
-      setSignOutModal(false);
-      Alert.alert("Error", "Failed to sign out. Please try again.");
-    } finally {
-      setLoading(false);
-    }
   };
 
   const onUpdatePassword = async () => {
@@ -176,7 +198,7 @@ export default function ProfileScreen() {
                 {loading ? <ActivityIndicator size="small" color="#FFF" /> : <Feather name="camera" size={14} color="#FFF" />}
               </TouchableOpacity>
             </View>
-            <Text style={styles.userName}>{`${userData.firstName} ${userData.lastName}`}</Text>
+            <Text style={styles.userName}>{userData.firstName ? `${userData.firstName} ${userData.lastName}` : 'User'}</Text>
             <Text style={styles.userEmail}>{userData.email}</Text>
           </View>
 
@@ -199,7 +221,6 @@ export default function ProfileScreen() {
             <MenuOption icon="message-square" label="Technician Chat" onPress={() => router.push('/chat/page')} />
           </View>
 
-          {/* Sign out now triggers the modal instead of native alert */}
           <TouchableOpacity style={styles.logoutBtn} onPress={() => setSignOutModal(true)}>
             <Feather name="log-out" size={18} color="#FF3B30" /><Text style={styles.logoutText}>Sign Out</Text>
           </TouchableOpacity>
@@ -309,7 +330,7 @@ export default function ProfileScreen() {
         </View>
       </Modal>
 
-      {/* NEW: PROFESSIONAL SIGN OUT MODAL */}
+      {/* SIGN OUT MODAL */}
       <Modal visible={signOutModal} animationType="slide" transparent={true}>
         <Pressable style={styles.modalOverlayBottom} onPress={() => setSignOutModal(false)}>
           <View style={styles.bottomSheet}>
@@ -321,25 +342,12 @@ export default function ProfileScreen() {
                 <Text style={styles.signOutTitle}>Log Out of ITKonek?</Text>
                 <Text style={styles.signOutSubtitle}>You will need to re-enter your credentials to access your account again.</Text>
             </View>
-
             <View style={styles.signOutActionRow}>
-                <TouchableOpacity 
-                    style={styles.signOutCancelBtn} 
-                    onPress={() => setSignOutModal(false)}
-                >
+                <TouchableOpacity style={styles.signOutCancelBtn} onPress={() => setSignOutModal(false)}>
                     <Text style={styles.signOutCancelText}>Cancel</Text>
                 </TouchableOpacity>
-
-                <TouchableOpacity 
-                    style={styles.signOutConfirmBtn} 
-                    onPress={executeSignOut}
-                    disabled={loading}
-                >
-                    {loading ? (
-                        <ActivityIndicator size="small" color="#FFF" />
-                    ) : (
-                        <Text style={styles.signOutConfirmText}>Logout</Text>
-                    )}
+                <TouchableOpacity style={styles.signOutConfirmBtn} onPress={executeSignOut} disabled={loading}>
+                    {loading ? <ActivityIndicator size="small" color="#FFF" /> : <Text style={styles.signOutConfirmText}>Logout</Text>}
                 </TouchableOpacity>
             </View>
           </View>

@@ -20,16 +20,10 @@ export default StyleSheet.create({
   },
 
   userLocationContainer: { alignItems: 'center', justifyContent: 'center' },
-  userDot: { width: 14, height: 14, borderRadius: 7, backgroundColor: '#2196F3', borderWidth: 2, borderColor: '#FFF' },
+  userDot: { width: 14, height: 14, borderRadius: 7, backgroundColor: '#2ECC71', borderWidth: 2, borderColor: '#FFF' },
 
-  engineerMarkerWrapper: { alignItems: 'center' },
-  engineerMarkerPin: {
-    backgroundColor: '#111', width: 36, height: 36, borderRadius: 18,
-    justifyContent: 'center', alignItems: 'center', borderWidth: 2, borderColor: '#FFF',
-    elevation: 10, shadowColor: '#000', shadowOpacity: 0.3, shadowRadius: 5,
-  },
-  markerLabel: { backgroundColor: '#111', paddingHorizontal: 6, paddingVertical: 2, borderRadius: 4, marginTop: 4 },
-  markerLabelText: { fontSize: 8, fontWeight: 'bold', color: '#FFF' },
+  engineerMarkerWrapper: { alignItems: 'center', justifyContent: 'center' },
+  engineerMarkerPin: { backgroundColor: '#004D4D', width: 28, height: 28, borderRadius: 14, justifyContent: 'center', alignItems: 'center', borderWidth: 2, borderColor: '#FFF', elevation: 4 },
 
   infoCard: {
     position: 'absolute', bottom: 0, width: width,
@@ -85,4 +79,27 @@ export default StyleSheet.create({
   keepBtnText: { color: '#FFF', fontWeight: '700' },
   confirmCancelBtn: { marginTop: 20, padding: 10 },
   confirmCancelText: { color: '#DC2626', fontWeight: '600' },
+  circleWrapper: {
+    width: 40,
+    height: 40,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  outerRing: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    backgroundColor: 'rgba(33, 150, 243, 0.15)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  innerDot: {
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    backgroundColor: '#111',
+    borderWidth: 2,
+    borderColor: '#FFF',
+    overflow: 'hidden',
+  },
 });
