@@ -16,9 +16,11 @@ import * as Location from 'expo-location';
 
 // Firebase imports
 import { db, auth } from '../../services/firebase'; 
-import { collection, query, where, onSnapshot, orderBy, limit, doc, updateDoc } from 'firebase/firestore';
+import { collection, query, where, onSnapshot, orderBy, limit, doc, getDoc, updateDoc } from 'firebase/firestore';
 
 import styles from './TrackingScreen.styles';
+
+const avatarNeutral = require('../../assets/images/avatar_neutral.png');
 
 export default function TrackingScreen() {
   const router = useRouter();
@@ -31,8 +33,55 @@ export default function TrackingScreen() {
   const [engineerLocation, setEngineerLocation] = useState(null);
   const [cancelModalVisible, setCancelModalVisible] = useState(false);
   const [noBookingModalVisible, setNoBookingModalVisible] = useState(false);
+  const [eta, setEta] = useState('Calculating...');
 
-  // 1. Setup Tracking and Firestore Listener
+  // Helper: Geocoding logic identical to SearchScreen
+  const getEngineerCoords = async (detailsData, bookingData) => {
+    // DEFAULT COORDINATES
+    let lat = 10.3157;
+    let lng = 123.8854;
+
+    if (detailsData.address && (!detailsData.latitude || !detailsData.longitude)) {
+      try {
+        const geocodedLocation = await Location.geocodeAsync(detailsData.address);
+        if (geocodedLocation.length > 0) {
+          lat = geocodedLocation[0].latitude;
+          lng = geocodedLocation[0].longitude;
+        }
+      } catch (error) {
+        console.warn("Geocoding failed for tracking:", detailsData.address);
+      }
+    } else {
+      // Prioritize booking-specific live location, fallback to profile static location
+      lat = parseFloat(bookingData.engineerLat || detailsData.latitude) || lat;
+      lng = parseFloat(bookingData.engineerLng || detailsData.longitude) || lng;
+    }
+
+    return { latitude: lat, longitude: lng };
+  };
+
+  const calculateETA = (lat1, lon1, lat2, lon2) => {
+    const R = 6371; 
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+    const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+              Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+              Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    const distance = R * c; 
+    const timeInMinutes = Math.round((distance / 30) * 60) + 5; 
+    return timeInMinutes < 5 ? "5-10" : `${timeInMinutes}-${timeInMinutes + 5}`;
+  };
+
+  useEffect(() => {
+    if (userLocation && engineerLocation && mapRef.current) {
+      mapRef.current.fitToCoordinates([userLocation, engineerLocation], {
+        edgePadding: { top: 100, right: 100, bottom: 400, left: 100 },
+        animated: true,
+      });
+    }
+  }, [userLocation, engineerLocation]);
+
   useEffect(() => {
     let unsubscribe;
 
@@ -45,10 +94,11 @@ export default function TrackingScreen() {
         }
 
         const initialLoc = await Location.getCurrentPositionAsync({});
-        setUserLocation({
+        const uLoc = {
           latitude: initialLoc.coords.latitude,
           longitude: initialLoc.coords.longitude,
-        });
+        };
+        setUserLocation(uLoc);
 
         const user = auth.currentUser;
         if (user) {
@@ -60,27 +110,43 @@ export default function TrackingScreen() {
             limit(1)
           );
 
-          unsubscribe = onSnapshot(q, (snapshot) => {
+          unsubscribe = onSnapshot(q, async (snapshot) => {
             if (!snapshot.empty) {
-              const data = { id: snapshot.docs[0].id, ...snapshot.docs[0].data() };
-              setActiveBooking(data);
-              setNoBookingModalVisible(false); // Hide "No Booking" if one is found
+              const bookingDoc = snapshot.docs[0];
+              const bookingData = bookingDoc.data();
               
-              if (data.engineerLat && data.engineerLng) {
-                setEngineerLocation({
-                  latitude: data.engineerLat,
-                  longitude: data.engineerLng
-                });
+              let detailsData = {};
+              let engineerPhoto = null;
+
+              if (bookingData.engineerId) {
+                const detailsRef = doc(db, "users", bookingData.engineerId, "engineerProfile", "details");
+                const detailsSnap = await getDoc(detailsRef);
+                if (detailsSnap.exists()) {
+                  detailsData = detailsSnap.data();
+                  engineerPhoto = detailsData.userPhoto;
+                }
               }
+
+              // Use the SearchScreen coordinate logic
+              const coords = await getEngineerCoords(detailsData, bookingData);
+              
+              setEngineerLocation(coords);
+              setActiveBooking({
+                id: bookingDoc.id,
+                ...bookingData,
+                engineerPhoto: engineerPhoto ? { uri: engineerPhoto } : avatarNeutral
+              });
+              setEta(calculateETA(coords.latitude, coords.longitude, uLoc.latitude, uLoc.longitude));
+              setNoBookingModalVisible(false);
             } else {
               setActiveBooking(null);
-              setNoBookingModalVisible(true); // Show professional modal if empty
+              setNoBookingModalVisible(true);
             }
             setLoading(false);
           });
         }
       } catch (err) {
-        console.error("Tracking Error:", err);
+        console.error("Tracking setup error:", err);
         setLoading(false);
       }
     };
@@ -89,12 +155,12 @@ export default function TrackingScreen() {
     return () => unsubscribe && unsubscribe();
   }, []);
 
-  // 2. Cancellation Logic
   const handleCancelBooking = async () => {
     try {
       if (activeBooking) {
         await updateDoc(doc(db, "bookings", activeBooking.id), {
-          status: 'Cancelled'
+          status: 'Cancelled',
+          updatedAt: new Date()
         });
         setCancelModalVisible(false);
         router.replace('/home/page');
@@ -108,7 +174,7 @@ export default function TrackingScreen() {
     return (
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color="#111" />
-        <Text style={styles.loadingText}>Connecting to Engineer...</Text>
+        <Text style={styles.loadingText}>Connecting to specialist...</Text>
       </View>
     );
   }
@@ -117,7 +183,6 @@ export default function TrackingScreen() {
     <View style={styles.container}>
       <StatusBar barStyle="dark-content" />
 
-      {/* MAP SECTION */}
       <MapView
         ref={mapRef}
         provider={PROVIDER_GOOGLE}
@@ -129,29 +194,27 @@ export default function TrackingScreen() {
         }}
         customMapStyle={mapStyle}
       >
-        {userLocation && (
-          <Marker coordinate={userLocation} anchor={{ x: 0.5, y: 0.5 }}>
-            <View style={styles.userLocationContainer}>
-              <View style={styles.userDot} />
-            </View>
-          </Marker>
-        )}
+        <Marker coordinate={userLocation} anchor={{ x: 0.5, y: 0.5 }} >
+          <View style={styles.userLocationContainer}>
+            <View style={styles.userDot} />
+          </View>
+        </Marker>
 
         {engineerLocation && (
           <>
             <Polyline
               coordinates={[engineerLocation, userLocation]}
               strokeColor="#111"
-              strokeWidth={3}
-              lineDashPattern={[1]}
+              strokeWidth={2}
+              lineDashPattern={[10, 10]}
             />
-            <Marker coordinate={engineerLocation} anchor={{ x: 0.5, y: 0.5 }}>
+            <Marker 
+              coordinate={engineerLocation} 
+              anchor={{ x: 0.5, y: 0.5 }}
+            >
               <View style={styles.engineerMarkerWrapper}>
                 <View style={styles.engineerMarkerPin}>
-                  <MaterialCommunityIcons name="moped" size={16} color="#FFF" />
-                </View>
-                <View style={styles.markerLabel}>
-                  <Text style={styles.markerLabelText}>ENGINEER</Text>
+                  <MaterialCommunityIcons name="tools" size={14} color="#FFF" />
                 </View>
               </View>
             </Marker>
@@ -159,44 +222,41 @@ export default function TrackingScreen() {
         )}
       </MapView>
 
-      {/* FLOATING HEADER */}
       <SafeAreaView style={styles.headerOverlay}>
         <TouchableOpacity style={styles.backBtn} onPress={() => router.back()}>
           <Ionicons name="chevron-back" size={24} color="#111" />
         </TouchableOpacity>
       </SafeAreaView>
 
-      {/* BOOKING INFO CARD */}
       {activeBooking && (
         <View style={styles.infoCard}>
           <View style={styles.pullBar} />
           <View style={styles.headerRow}>
-            <View style={styles.statusBadge}>
-              <Text style={styles.statusLabel}>{activeBooking.status.toUpperCase()}</Text>
+            <View style={[styles.statusBadge, { backgroundColor: activeBooking.status === 'On the way' ? '#111' : '#F3F4F6' }]}>
+              <Text style={[styles.statusLabel, { color: activeBooking.status === 'On the way' ? '#FFF' : '#111' }]}>
+                {activeBooking.status.toUpperCase()}
+              </Text>
             </View>
             <View style={styles.etaBadge}>
               <Feather name="clock" size={12} color="#374151" />
-              <Text style={styles.etaText}> ETA: 5-10 MINS</Text>
+              <Text style={styles.etaText}> ETA: {eta} MINS</Text>
             </View>
           </View>
 
           <Text style={styles.mainTitle}>
-            {activeBooking.status === "On the way" ? "Technician is moving" : "Finding Best Route"}
+            {activeBooking.status === "Pending" ? "Verifying Request" : "Specialist Assigned"}
           </Text>
           <Text style={styles.subTitle}>
-            {activeBooking.engineerName} is heading to your location for {activeBooking.serviceName} service.
+            {activeBooking.engineerName || "Your technician"} is on the way.
           </Text>
 
           <View style={styles.divider} />
 
           <View style={styles.profileSection}>
-            <Image 
-              source={require('../../assets/images/technician.png')} 
-              style={styles.avatar} 
-            />
+            <Image source={activeBooking.engineerPhoto} style={styles.avatar} />
             <View style={styles.profileText}>
-              <Text style={styles.nameText}>{activeBooking.engineerName}</Text>
-              <Text style={styles.specialtyText}>Verified Professional</Text>
+              <Text style={styles.nameText}>{activeBooking.engineerName || "Technician"}</Text>
+              <Text style={styles.specialtyText}>Verified Hardware Specialist</Text>
             </View>
             <TouchableOpacity style={styles.callCircle}>
               <Feather name="phone" size={18} color="#111" />
@@ -208,8 +268,8 @@ export default function TrackingScreen() {
               style={styles.secondaryBtn}
               onPress={() => router.push({ pathname: '/home/booking/page', params: { isEditing: 'true', ...activeBooking } })}
             >
-              <Feather name="edit-3" size={16} color="#111" />
-              <Text style={styles.btnText}>Modify</Text>
+              <Feather name="list" size={16} color="#111" />
+              <Text style={styles.btnText}>Details</Text>
             </TouchableOpacity>
 
             <TouchableOpacity style={styles.cancelBtn} onPress={() => setCancelModalVisible(true)}>
@@ -220,7 +280,7 @@ export default function TrackingScreen() {
 
           <TouchableOpacity 
             style={styles.messageBtn} 
-            onPress={() => router.push('/chat/page')}
+            onPress={() => router.push({ pathname: '/chat/page', params: { engineerId: activeBooking.engineerId }})}
           >
             <MaterialCommunityIcons name="chat-processing" size={22} color="#FFF" />
             <Text style={styles.messageBtnText}>Message Engineer</Text>
@@ -228,60 +288,29 @@ export default function TrackingScreen() {
         </View>
       )}
 
-      {/* PROFESSIONAL NO BOOKING MODAL */}
+      {/* MODALS */}
       <Modal animationType="fade" transparent visible={noBookingModalVisible}>
         <View style={styles.modalOverlay}>
           <View style={styles.professionalModal}>
-            <View style={styles.noBookingIconBg}>
-              <MaterialCommunityIcons name="shield-search" size={40} color="#111" />
-            </View>
-            <Text style={styles.modalTitle}>No Active Sessions</Text>
-            <Text style={styles.modalSubText}>
-              You don't have any ongoing repairs. Start a new request to connect with a technician.
-            </Text>
-
-            <View style={styles.benefitList}>
-              <View style={styles.benefitItem}>
-                <Feather name="check-circle" size={12} color="#10B981" />
-                <Text style={styles.benefitText}>Verified Pros</Text>
-              </View>
-              <View style={styles.benefitItem}>
-                <Feather name="check-circle" size={12} color="#10B981" />
-                <Text style={styles.benefitText}>Live Tracking</Text>
-              </View>
-            </View>
-            
-            <TouchableOpacity 
-              style={styles.primaryActionBtn} 
-              onPress={() => router.push('/home/booking/page')} 
-            >
-              <Text style={styles.primaryActionText}>Book a Service Now</Text>
-              <Feather name="arrow-right" size={18} color="#FFF" />
-            </TouchableOpacity>
-
-            <TouchableOpacity onPress={() => router.replace('/home/page')} style={styles.textOnlyBtn}>
-              <Text style={styles.textOnlyBtnLabel}>Return to Home</Text>
+            <MaterialCommunityIcons name="map-marker-off" size={40} color="#111" />
+            <Text style={styles.modalTitle}>No Active Tracking</Text>
+            <TouchableOpacity style={styles.primaryActionBtn} onPress={() => router.push('/home/page')}>
+              <Text style={styles.primaryActionText}>Return Home</Text>
             </TouchableOpacity>
           </View>
         </View>
       </Modal>
 
-      {/* CANCELLATION MODAL */}
       <Modal animationType="fade" transparent visible={cancelModalVisible}>
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
-            <View style={styles.modalIconBg}>
-              <Feather name="alert-triangle" size={32} color="#DC2626" />
-            </View>
-            <Text style={styles.modalTitle}>Cancel Request?</Text>
-            <Text style={styles.modalSub}>
-              {activeBooking?.engineerName} is already assigned. Cancellation fees may apply.
-            </Text>
+            <Feather name="alert-circle" size={32} color="#DC2626" />
+            <Text style={styles.modalTitle}>Cancel Service?</Text>
             <TouchableOpacity style={styles.keepBtn} onPress={() => setCancelModalVisible(false)}>
-              <Text style={styles.keepBtnText}>Keep Booking</Text>
+              <Text style={styles.keepBtnText}>No, Keep Booking</Text>
             </TouchableOpacity>
             <TouchableOpacity onPress={handleCancelBooking} style={styles.confirmCancelBtn}>
-              <Text style={styles.confirmCancelText}>Confirm Cancellation</Text>
+              <Text style={styles.confirmCancelText}>Yes, Cancel</Text>
             </TouchableOpacity>
           </View>
         </View>

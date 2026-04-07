@@ -1,37 +1,73 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
-  FlatIcons,
   TouchableOpacity,
   TextInput,
   Image,
   FlatList,
   StatusBar,
-  SafeAreaView
+  SafeAreaView,
+  ActivityIndicator
 } from 'react-native';
-import { Ionicons, MaterialIcons, Feather } from '@expo/vector-icons';
+import { Ionicons, Feather } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import styles from './TechList.styles';
 
-const ALL_ENGINEERS = [
-  { id: '1', name: 'Engr. Mark Anthony Dela Cruz', specialty: 'Master Logic Board Tech', rating: 4.8, distance: 'Cebu City', image: require('../../assets/images/technician.png') },
-  { id: '2', name: 'Engr. Maria Angela Lopez', specialty: 'Network Architect', rating: 4.9, distance: 'Mandaue City', image: require('../../assets/images/technician.png') },
-  { id: '3', name: 'Engr. John Carlo Santos', specialty: 'Performance Engineer', rating: 4.7, distance: 'Lapu-Lapu City', image: require('../../assets/images/technician.png') },
-  { id: '4', name: 'Engr. Jennifer Mae Villanueva', specialty: 'Hardware Diagnostic Expert', rating: 4.9, distance: 'Talisay City', image: require('../../assets/images/technician.png') },
-  { id: '5', name: 'Engr. Michael Angelo Reyes', specialty: 'Data Recovery Specialist', rating: 4.8, distance: 'Consolacion', image: require('../../assets/images/technician.png') },
-  { id: '6', name: 'Engr. Patricia Anne Castillo', specialty: 'CCTV & Security Systems', rating: 4.6, distance: 'Liloan, Cebu', image: require('../../assets/images/technician.png') },
-  { id: '7', name: 'Engr. Kevin Louie Garcia', specialty: 'Software Architect', rating: 4.9, distance: 'Banilad, Cebu', image: require('../../assets/images/technician.png') },
-  { id: '8', name: 'Engr. Kristine Joy Navarro', specialty: 'Apple Certified Specialist', rating: 5.0, distance: 'Lahug, Cebu', image: require('../../assets/images/technician.png') },
-  { id: '9', name: 'Engr. Christian Paul Mendoza', specialty: 'Thermal & Cooling Expert', rating: 4.7, distance: 'Cordova, Cebu', image: require('../../assets/images/technician.png') },
-  { id: '10', name: 'Engr. Angelica Marie Torres', specialty: 'POS & Retail Systems', rating: 4.8, distance: 'Minglanilla', image: require('../../assets/images/technician.png') },
-];
+// Firebase Imports
+import { db } from '../../services/firebase';
+import { collection, query, where, getDocs, doc, getDoc } from 'firebase/firestore';
+
+const avatarNeutral = require('../../assets/images/avatar_neutral.png');
 
 export default function TechList() {
   const router = useRouter();
   const [search, setSearch] = useState('');
+  const [engineers, setEngineers] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const filteredTechs = ALL_ENGINEERS.filter(tech => 
+  useEffect(() => {
+    fetchEngineers();
+  }, []);
+
+  const fetchEngineers = async () => {
+    try {
+      // 1. Get all users with the role 'engineer'
+      const q = query(collection(db, "users"), where("role", "==", "engineer"));
+      const querySnapshot = await getDocs(q);
+      
+      const techData = await Promise.all(querySnapshot.docs.map(async (userDoc) => {
+        const userData = userDoc.data();
+        
+        // 2. Fetch the specific sub-collection where the engineer photo is stored
+        const detailsRef = doc(db, "users", userDoc.id, "engineerProfile", "details");
+        const detailsSnap = await getDoc(detailsRef);
+        const detailsData = detailsSnap.exists() ? detailsSnap.data() : {};
+
+        return {
+          id: userDoc.id,
+          name: `${userData.firstName} ${userData.lastName}`,
+          // Engineers use 'primaryRole' from the signup form
+          specialty: userData.primaryRole || detailsData.primaryRole || 'Professional Technician',
+          rating: userData.rating || 5.0,
+          // Use 'address' from sub-collection or main doc
+          distance: detailsData.address || userData.address || 'Nearby',
+          // KEY FIX: Use 'userPhoto' for engineers, fallback to 'profileImage' or neutral avatar
+          image: detailsData.userPhoto 
+            ? { uri: detailsData.userPhoto } 
+            : (userData.profileImage ? { uri: userData.profileImage } : avatarNeutral),
+        };
+      }));
+
+      setEngineers(techData);
+    } catch (error) {
+      console.error("Error fetching technicians:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const filteredTechs = engineers.filter(tech => 
     tech.name.toLowerCase().includes(search.toLowerCase()) || 
     tech.specialty.toLowerCase().includes(search.toLowerCase())
   );
@@ -52,7 +88,11 @@ export default function TechList() {
         style={styles.bookBtn}
         onPress={() => router.push({
           pathname: '/home/booking/page',
-          params: { engineerName: item.name, serviceName: item.specialty }
+          params: { 
+            engineerId: item.id, 
+            engineerName: item.name, 
+            serviceName: item.specialty 
+          }
         })}
       >
         <Feather name="plus" size={20} color="#FFF" />
@@ -84,14 +124,25 @@ export default function TechList() {
         />
       </View>
 
-      {/* List */}
-      <FlatList
-        data={filteredTechs}
-        keyExtractor={(item) => item.id}
-        renderItem={renderTechItem}
-        contentContainerStyle={styles.listContent}
-        showsVerticalScrollIndicator={false}
-      />
+      {/* List logic */}
+      {loading ? (
+        <View style={{ flex: 1, justifyContent: 'center' }}>
+          <ActivityIndicator size="large" color="#000" />
+        </View>
+      ) : (
+        <FlatList
+          data={filteredTechs}
+          keyExtractor={(item) => item.id}
+          renderItem={renderTechItem}
+          contentContainerStyle={styles.listContent}
+          showsVerticalScrollIndicator={false}
+          ListEmptyComponent={
+            <Text style={{ textAlign: 'center', marginTop: 50, color: '#999' }}>
+              No technicians found.
+            </Text>
+          }
+        />
+      )}
     </SafeAreaView>
   );
 }

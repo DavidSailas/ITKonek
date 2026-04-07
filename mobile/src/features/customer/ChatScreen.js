@@ -1,29 +1,14 @@
 import React, { useState, useRef, useEffect } from 'react';
 import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  FlatList,
-  KeyboardAvoidingView,
-  Platform,
-  Image,
-  StatusBar,
-  ActivityIndicator
+  View, Text, TextInput, TouchableOpacity, FlatList,
+  KeyboardAvoidingView, Platform, Image, StatusBar, ActivityIndicator
 } from 'react-native';
 import { Ionicons, Feather, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { auth, db } from '../../services/firebase';
 import { 
-  collection, 
-  query, 
-  where, 
-  onSnapshot, 
-  addDoc, 
-  serverTimestamp, 
-  orderBy,
-  doc,
-  updateDoc
+  collection, query, where, onSnapshot, addDoc, 
+  serverTimestamp, orderBy, doc, updateDoc
 } from 'firebase/firestore';
 import styles from './ChatScreen.styles';
 import BottomNav from '../../components/BottomNav';
@@ -74,14 +59,12 @@ export default function ChatScreen() {
       const msgs = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
       setMessages(msgs);
 
-      // MARK AS READ: If the last message is from engineer, mark it read
       msgs.forEach(msg => {
         if (msg.sender === 'engineer' && !msg.read) {
           updateDoc(doc(db, "bookings", selectedBooking.id, "messages", msg.id), { read: true });
         }
       });
 
-      // Also update the main booking doc to reflect that the latest message is now read
       if (selectedBooking.latestSender === 'engineer') {
           updateDoc(doc(db, "bookings", selectedBooking.id), { lastRead: true });
       }
@@ -107,7 +90,6 @@ export default function ChatScreen() {
         time: currentTime,
       });
 
-      // Update booking doc with latest message preview and time
       await updateDoc(doc(db, "bookings", selectedBooking.id), {
         latestMsg: textToSend,
         latestSender: 'customer',
@@ -158,9 +140,22 @@ export default function ChatScreen() {
         </View>
 
         {allBookings.length === 0 ? (
-          <View style={styles.emptyState}>
-            <View style={styles.emptyIconCircle}><Feather name="message-square" size={32} color="#AAA" /></View>
-            <Text style={styles.emptyTitle}>Direct support starts here</Text>
+          <View style={styles.emptyContainer}>
+            <View style={styles.emptyIllustration}>
+              <View style={styles.emptyCircleLarge} />
+              <View style={styles.emptyCircleSmall} />
+              <Feather name="message-circle" size={50} color="#111" />
+            </View>
+            <Text style={styles.emptyHeading}>No active sessions</Text>
+            <Text style={styles.emptyDescription}>
+              When you book a service, your conversation with the engineer will appear here.
+            </Text>
+            <TouchableOpacity 
+              style={styles.emptyButton}
+              onPress={() => router.push('/home/dashboard/page')}
+            >
+              <Text style={styles.emptyButtonText}>Book a Service</Text>
+            </TouchableOpacity>
           </View>
         ) : (
           <FlatList
@@ -169,13 +164,17 @@ export default function ChatScreen() {
             renderItem={({ item }) => {
               const isUnread = item.latestSender === 'engineer' && item.lastRead === false;
               const isCustomerLast = item.latestSender === 'customer';
+              const engineerDisplayName = item.engineerName ? `Engr. ${item.engineerName}` : "Technical Support";
               
               return (
                 <TouchableOpacity style={styles.inboxItem} onPress={() => setSelectedBooking(item)}>
-                  <Image source={require('../../assets/images/technician.png')} style={styles.inboxAvatar} />
+                  <Image 
+                    source={item.engineerPhoto ? { uri: item.engineerPhoto } : require('../../assets/images/technician.png')} 
+                    style={styles.inboxAvatar} 
+                  />
                   <View style={styles.inboxContent}>
                     <View style={styles.inboxRow}>
-                      <Text style={styles.inboxName}>Technical Support</Text>
+                      <Text style={styles.inboxName}>{engineerDisplayName}</Text>
                       <Text style={[styles.inboxStatusText, { color: item.status === 'Cancelled' ? '#DC2626' : '#22C55E' }]}>
                         {item.status.toUpperCase()}
                       </Text>
@@ -206,6 +205,7 @@ export default function ChatScreen() {
   }
 
   const isFinished = ['completed', 'cancelled'].includes(selectedBooking.status?.toLowerCase());
+  const activeEngineerName = selectedBooking.engineerName ? `Engr. ${selectedBooking.engineerName}` : "Technical Support";
 
   return (
     <View style={styles.container}>
@@ -215,7 +215,7 @@ export default function ChatScreen() {
           <Feather name="chevron-left" size={24} color="#111" />
         </TouchableOpacity>
         <View style={styles.headerInfo}>
-          <Text style={styles.userName}>Technical Support</Text>
+          <Text style={styles.userName}>{activeEngineerName}</Text>
           <Text style={styles.statusText}>{selectedBooking.status}</Text>
         </View>
       </View>
@@ -240,7 +240,7 @@ export default function ChatScreen() {
               />
               <Text style={styles.summaryTitle}>Service {selectedBooking.status}</Text>
               <Text style={styles.summaryText}>
-                This session has been marked as {selectedBooking.status.toLowerCase()}.
+                Your session with {activeEngineerName} regarding {selectedBooking.serviceName} has been archived.
               </Text>
             </View>
           ) : null}

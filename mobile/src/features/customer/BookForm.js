@@ -69,7 +69,6 @@ export default function BookForm() {
   const [timeText, setTimeText] = useState('');
 
   const [paymentMethod, setPaymentMethod] = useState(null); 
-  // NEW: Card Detail States
   const [cardDetails, setCardDetails] = useState({ number: '', expiry: '', cvv: '' });
 
   const [modalVisible, setModalVisible] = useState(false);
@@ -77,8 +76,21 @@ export default function BookForm() {
   const [showPicker, setShowPicker] = useState(false);
   const [pickerMode, setPickerMode] = useState('date');
 
+  // --- Real Data Engineer Location State ---
+  const [engineerDetails, setEngineerDetails] = useState({
+    id: params.engineerId || params.id || null,
+    name: params.engineerName || params.name || "Finding Technician...",
+    lat: params.engLat ? parseFloat(params.engLat) : (params.latitude ? parseFloat(params.latitude) : 10.3157),
+    lng: params.engLng ? parseFloat(params.engLng) : (params.longitude ? parseFloat(params.longitude) : 123.8854),
+  });
+
   useEffect(() => {
     fetchLinkedStatus();
+    // Verify if we need to fetch fresh location/name from Firestore
+    if (engineerDetails.id && (!params.engLat || engineerDetails.name === "Finding Technician...")) {
+      fetchFreshEngineerData(engineerDetails.id);
+    }
+
     if (!params.isEditing && !location) {
       getCurrentLocation();
     }
@@ -89,6 +101,24 @@ export default function BookForm() {
     return () => { showSub.remove(); hideSub.remove(); };
   }, []);
 
+  const fetchFreshEngineerData = async (id) => {
+    try {
+      const docRef = doc(db, "users", id);
+      const docSnap = await getDoc(docRef);
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        setEngineerDetails(prev => ({
+          ...prev,
+          name: `${data.firstName} ${data.lastName}`,
+          lat: data.latitude || prev.lat,
+          lng: data.longitude || prev.lng,
+        }));
+      }
+    } catch (err) {
+      console.error("Error fetching fresh engineer data:", err);
+    }
+  };
+
   useEffect(() => {
     let timer;
     if (countdown > 0) {
@@ -97,7 +127,6 @@ export default function BookForm() {
     return () => clearInterval(timer);
   }, [countdown]);
 
-  // Handle auto-trigger for OTP
   useEffect(() => {
     if (phoneNumber.length === 10 && authStep === 1 && !isSendingOtp) {
       handleSendOtp();
@@ -161,14 +190,11 @@ export default function BookForm() {
     if (!result.canceled) setAttachedImage(result.assets[0].uri);
   };
 
-  // NEW: Handle Card Scanning Simulation
   const handleScanCard = async () => {
     const { status } = await ImagePicker.requestCameraPermissionsAsync();
     if (status !== 'granted') return Alert.alert('Error', 'Camera permission needed to scan card');
-    
     let result = await ImagePicker.launchCameraAsync({ allowsEditing: true, quality: 0.8 });
     if (!result.canceled) {
-      // Simulation of OCR auto-fill
       setCardDetails({ ...cardDetails, number: '4242 4242 4242 4242' });
       Alert.alert("Card Scanned", "Card number has been automatically detected.");
     }
@@ -250,7 +276,9 @@ const saveToFirestore = async () => {
 
       const bookingData = {
         userId: user.uid,
-        location,
+        userName: user.displayName || "Customer", 
+        userPhoto: user.photoURL || null,         
+        address: location,                       
         serviceName,
         description,
         urgency,
@@ -259,21 +287,26 @@ const saveToFirestore = async () => {
         scheduledDate: isScheduled ? dateText : 'Now',
         scheduledTime: isScheduled ? timeText : 'Now',
         cardLastFour: paymentMethod === 'Card' ? cardDetails.number.slice(-4) : null,
+        engineerId: null, 
+        engineerName: null,
         
-        engineerId: params.engineerId || null, 
-        engineerName: params.engineerName || "Finding Technician...",
-
-        engineerLat: params.engLat ? parseFloat(params.engLat) : 10.3157,
-        engineerLng: params.engLng ? parseFloat(params.engLng) : 123.8854,
+        // You can store the 'Target' engineer as a separate reference if needed
+        requestedEngineerId: engineerDetails.id, 
         
-        status: 'Pending',
+        // Keep the coordinates for the map
+        engineerLat: engineerDetails.lat,
+        engineerLng: engineerDetails.lng,
+        
+        status: 'Pending', // Status must be exactly 'Pending'
         imageUrl: attachedImage || null,
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp(),
       };
 
+      // 1. Save Booking
       const bookingRef = await addDoc(collection(db, "bookings"), bookingData);
 
+      // 2. Save Payment Authorization
       await addDoc(collection(db, "payments"), {
         bookingId: bookingRef.id,
         userId: user.uid,
@@ -452,7 +485,6 @@ const saveToFirestore = async () => {
           <View style={[styles.radioCircle, paymentMethod === 'Card' && styles.radioActive]} />
       </TouchableOpacity>
 
-      {/* NEW: Card Input Fields with Camera Scan */}
       {paymentMethod === 'Card' && (
         <View style={styles.cardInputContainer}>
           <Text style={styles.label}>Card Information</Text>
@@ -594,4 +626,3 @@ const saveToFirestore = async () => {
     </View>
   );
 }
-
