@@ -14,8 +14,8 @@ export function StatsCards() {
       {data.map((item) => (
         <Card key={item.label} className="p-4 bg-background border-lines">
           <div className="flex justify-between items-start mb-2">
-            <span className="text-xs font-medium text-description">{item.label}</span>
-            <span className={`text-[10px] px-2 py-0.5 rounded-full border ${item.negative ? 'border-destructive/20 text-destructive' : 'border-tint/20 text-tint'} font-bold`}>
+            <span className="flex text-sm font-medium text-description">{item.label}</span>
+            <span className={`text-[12px] px-3 py-2 rounded-full border ${item.negative ? 'border-destructive/20 text-destructive' : 'border-tint/20 text-tint'} font-bold`}>
               {item.trend}
             </span>
           </div>

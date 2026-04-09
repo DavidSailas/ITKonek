@@ -9,12 +9,16 @@ import {
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { MoreHorizontal, GripVertical, Columns, Plus } from "lucide-react"
 
+// To do: Make this as a JSON File
+
 export function BookingTable() {
     const bookings = [
         { id: 1, service: "Vessel Management System", type: "Software", status: "Done", target: "12", pro: "cj_dev" },
         { id: 2, service: "MTI Seafarer Portal", type: "Web App", status: "In Progress", target: "08", pro: "Eddie Lake" },
         { id: 3, service: "Network Infrastructure", type: "IT Support", status: "In Progress", target: "24", pro: "Jamik T." },
-        { id: 4, service: "Marine Training Database", type: "Database", status: "Done", target: "05", pro: "cj_dev" },
+        { id: 4, service: "Marine Training Database", type: "Database", status: "Done", target: "05", pro: "cj_dev" }
+        
+        ,
     ]
 
     return (
