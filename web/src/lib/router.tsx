@@ -5,6 +5,7 @@ import { ProtectedRoute } from '@/features/auth/components/ProtectedRoute';
 import DashboardPage from '@/pages/dashboard/DashboardPage';
 import BookingsPage from '@/pages/dashboard/BookingsPage';
 import ProfessionalsPage from '@/pages/dashboard/ProfessionalsPage';
+import CustomersPage from '@/pages/dashboard/CustomersPage';
 
 export const router = createBrowserRouter([
   {
@@ -35,7 +36,7 @@ export const router = createBrowserRouter([
           },
           {
             path: "customers",
-            element: <div>Customers</div>,
+            element: <CustomersPage />,
           },
           {
             path: "services",

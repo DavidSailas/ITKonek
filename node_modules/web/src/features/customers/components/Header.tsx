@@ -6,10 +6,10 @@ export const Header = () => {
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
             <div className="flex flex-col gap-3">
                 <h2 className="text-2xl font-bold tracking-tight font-poppins text-foreground">
-                    Bookings
+                    Customers
                 </h2>
                 <p className="text-description text-sm leading-none">
-                    Monitor service requests.
+                    Manage your customers.
                 </p>
             </div>
             <div className="flex items-center gap-3 w-full sm:w-auto">
@@ -20,7 +20,7 @@ export const Header = () => {
                     />
                     <input
                         type="text"
-                        placeholder="Search bookings..."
+                        placeholder="Search customer..."
                         className="w-full h-10 bg-background border border-lines rounded-xl pl-10 pr-4 text-sm focus:ring-1 focus:ring-tint focus:border-tint transition-all outline-none font-poppins text-foreground placeholder:text-description/50"
                     />
                 </div>

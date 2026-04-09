@@ -9,10 +9,10 @@ import {
 import type { SortingState } from "@tanstack/react-table";
 
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { columns, type Professional } from "./columns";
+import { columns, type Customer } from "./columns";
 import { TablePagination } from "@/components/table-pagination";
 
-export function ProfessionalsTable({ data }: { data: Professional[] }) {
+export function CustomersTable({ data }: { data: Customer[] }) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [rowSelection, setRowSelection] = React.useState({});
 
@@ -61,7 +61,7 @@ export function ProfessionalsTable({ data }: { data: Professional[] }) {
             ) : (
               <TableRow>
                 <TableCell colSpan={columns.length} className="h-24 text-center text-description">
-                  No professionals found.
+                  No customers found.
                 </TableCell>
               </TableRow>
             )}
