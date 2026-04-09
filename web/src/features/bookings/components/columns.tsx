@@ -14,6 +14,7 @@ import { cn } from "@/lib/utils";
 
 export interface Booking {
     id: string;
+    photo: string;
     customer: string;
     service: string;
     status: string;
@@ -56,12 +57,24 @@ export const columns: ColumnDef<Booking>[] = [
                 <ArrowUpDown className="ml-2 h-4 w-4" />
             </Button>
         ),
-        cell: ({ row }) => <div className="font-medium">{row.getValue("customer")}</div>,
+        cell: ({ row }) => {
+            const photo = row.original.photo;
+            const name = row.getValue("customer") as string;
+            return (
+                <div className="flex items-center gap-3 min-w-[200px]">
+                    <div className="h-9 w-9 shrink-0 rounded-full overflow-hidden bg-slate-100 border border-lines">
+                        <img src={photo} alt={name} className="h-full w-full object-cover" />
+                    </div>
+                    <div className="font-semibold text-sm truncate">{name}</div>
+                </div>
+            );
+        },
     },
     {
         accessorKey: "service",
         header: "Service Type",
-        cell: ({ row }) => <div className="text-description text-sm">{row.getValue("service")}</div>,
+        cell: ({ row }) => 
+        <div className="text-description text-sm">{row.getValue("service")}</div>,
     },
     {
         accessorKey: "status",
