@@ -79,7 +79,7 @@ export const columns: ColumnDef<Customer>[] = [
         accessorKey: "email",
         header: "Email Address",
         cell: ({ row }) => <div className="flex gap-3 text-description text-sm line-clamp-1 min-w-[150px]">
-            <Mail size={22} />
+            <Mail size={19} />
             {row.getValue("email")} 
         </div>,
     },
@@ -87,7 +87,7 @@ export const columns: ColumnDef<Customer>[] = [
         accessorKey: "mobileNumber",
         header: "Mobile Number",
         cell: ({ row }) => <div className="flex gap-3 text-description text-sm line-clamp-1 min-w-[150px]">
-            <Phone size={22} />
+            <Phone size={19} />
             {row.getValue("mobileNumber")} 
         </div>,
     },
