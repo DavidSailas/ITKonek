@@ -11,7 +11,6 @@ export default function BookingsPage() {
     return (
         <div className="space-y-6">
             <Header />
-
             <BookingsTable data={data} />
         </div>
 

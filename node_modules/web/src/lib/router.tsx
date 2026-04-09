@@ -4,6 +4,7 @@ import DashboardLayout from '@/components/layouts/DashboardLayout';
 import { ProtectedRoute } from '@/features/auth/components/ProtectedRoute';
 import DashboardPage from '@/pages/dashboard/DashboardPage';
 import BookingsPage from '@/pages/dashboard/BookingsPage';
+import ProfessionalsPage from '@/pages/dashboard/ProfessionalsPage';
 
 export const router = createBrowserRouter([
   {
@@ -30,7 +31,7 @@ export const router = createBrowserRouter([
           },
           {
             path: "pros",
-            element: <div>IT Professionals</div>,
+            element: <ProfessionalsPage />,
           },
           {
             path: "customers",

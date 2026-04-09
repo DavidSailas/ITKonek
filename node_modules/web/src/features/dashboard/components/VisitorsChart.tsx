@@ -17,7 +17,7 @@ export function VisitorsChart() {
           ))}
         </div>
       </CardHeader>
-      <CardContent className="h-[300px] flex items-end justify-center pb-8">
+      <CardContent className="h-[400px] flex items-end justify-center pb-8">
         {/* Placeholder for AreaChart */}
         <div className="w-full h-full bg-gradient-to-t from-tint/10 to-transparent rounded-t-3xl border-t border-tint/20 flex items-center justify-center">
             <p className="text-xs font-mono text-tint uppercase tracking-[0.3em] animate-pulse">Visualizing Data Layers...</p>

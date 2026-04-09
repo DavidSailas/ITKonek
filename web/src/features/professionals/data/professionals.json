@@ -1,0 +1,322 @@
+[
+  {
+    "id": "IT-1001",
+    "photo": "https://api.dicebear.com/7.x/avataaars/svg?seed=TechHub",
+    "fullName": "TechHub Solutions",
+    "coreCompetency": "Cloud Infrastructure Audit",
+    "ratings": 5.0,
+    "status": "active"
+  },
+  {
+    "id": "IT-1002",
+    "photo": "https://api.dicebear.com/7.x/avataaars/svg?seed=Lumina",
+    "fullName": "Lumina Dental",
+    "coreCompetency": "Server Migration",
+    "ratings": 4.8,
+    "status": "active"
+  },
+  {
+    "id": "IT-1003",
+    "photo": "https://api.dicebear.com/7.x/avataaars/svg?seed=Sarah",
+    "fullName": "Sarah Jenkins",
+    "coreCompetency": "OS Optimization & Cleanup",
+    "ratings": 4.5,
+    "status": "active"
+  },
+  {
+    "id": "IT-1004",
+    "photo": "https://api.dicebear.com/7.x/avataaars/svg?seed=Green",
+    "fullName": "Green Leaf Cafe",
+    "coreCompetency": "POS System Integration",
+    "ratings": 0.0,
+    "status": "active"
+  },
+  {
+    "id": "IT-1005",
+    "photo": "https://api.dicebear.com/7.x/avataaars/svg?seed=Summit",
+    "fullName": "Summit Law Firm",
+    "coreCompetency": "Data Recovery (2TB HDD)",
+    "ratings": 4.2,
+    "status": "active"
+  },
+  {
+    "id": "IT-1006",
+    "photo": "https://api.dicebear.com/7.x/avataaars/svg?seed=Global",
+    "fullName": "Global Academy",
+    "coreCompetency": "Campus Wi-Fi Deployment",
+    "ratings": 4.9,
+    "status": "active"
+  },
+  {
+    "id": "IT-1007",
+    "photo": "https://api.dicebear.com/7.x/avataaars/svg?seed=David",
+    "fullName": "David Chen",
+    "coreCompetency": "Custom PC Build (Gaming)",
+    "ratings": 4.7,
+    "status": "active"
+  },
+  {
+    "id": "IT-1008",
+    "photo": "https://api.dicebear.com/7.x/avataaars/svg?seed=Spark",
+    "fullName": "Spark Logistics",
+    "coreCompetency": "Fleet Tracking API Fix",
+    "ratings": 4.6,
+    "status": "active"
+  },
+  {
+    "id": "IT-1009",
+    "photo": "https://api.dicebear.com/7.x/avataaars/svg?seed=Metro",
+    "fullName": "Metro Hospital",
+    "coreCompetency": "Firewall Configuration",
+    "ratings": 4.4,
+    "status": "active"
+  },
+  {
+    "id": "IT-1010",
+    "photo": "https://api.dicebear.com/7.x/avataaars/svg?seed=Anna",
+    "fullName": "Anna Rivera",
+    "coreCompetency": "Laptop Screen Replacement",
+    "ratings": 4.8,
+    "status": "active"
+  },
+  {
+    "id": "IT-1011",
+    "photo": "https://api.dicebear.com/7.x/avataaars/svg?seed=Pixel",
+    "fullName": "Pixel Studio",
+    "coreCompetency": "NAS Setup & Raid Config",
+    "ratings": 4.3,
+    "status": "active"
+  },
+  {
+    "id": "IT-1012",
+    "photo": "https://api.dicebear.com/7.x/avataaars/svg?seed=Bake",
+    "fullName": "Bake & Brew",
+    "coreCompetency": "Guest Network Setup",
+    "ratings": 4.7,
+    "status": "active"
+  },
+  {
+    "id": "IT-1013",
+    "photo": "https://api.dicebear.com/7.x/avataaars/svg?seed=James",
+    "fullName": "James Wilson",
+    "coreCompetency": "Malware Removal",
+    "ratings": 0.0,
+    "status": "active"
+  },
+  {
+    "id": "IT-1014",
+    "photo": "https://api.dicebear.com/7.x/avataaars/svg?seed=FinTrack",
+    "fullName": "FinTrack Inc.",
+    "coreCompetency": "QuickBooks Troubleshooting",
+    "ratings": 4.5,
+    "status": "active"
+  },
+  {
+    "id": "IT-1015",
+    "photo": "https://api.dicebear.com/7.x/avataaars/svg?seed=Zen",
+    "fullName": "Zen Wellness",
+    "coreCompetency": "CCTV Over IP Installation",
+    "ratings": 4.1,
+    "status": "active"
+  },
+  {
+    "id": "IT-1016",
+    "photo": "https://api.dicebear.com/7.x/avataaars/svg?seed=Kevin",
+    "fullName": "Kevin Hart",
+    "coreCompetency": "BIOS Update & Recovery",
+    "ratings": 5.0,
+    "status": "active"
+  },
+  {
+    "id": "IT-1017",
+    "photo": "https://api.dicebear.com/7.x/avataaars/svg?seed=Urban",
+    "fullName": "Urban Stay",
+    "coreCompetency": "Smart Lock Integration",
+    "ratings": 4.2,
+    "status": "active"
+  },
+  {
+    "id": "IT-1018",
+    "photo": "https://api.dicebear.com/7.x/avataaars/svg?seed=Dough",
+    "fullName": "Dough Co.",
+    "coreCompetency": "Epson Printer Network Fix",
+    "ratings": 4.4,
+    "status": "active"
+  },
+  {
+    "id": "IT-1019",
+    "photo": "https://api.dicebear.com/7.x/avataaars/svg?seed=Maria",
+    "fullName": "Maria Santos",
+    "coreCompetency": "iPhone Battery Replacement",
+    "ratings": 4.9,
+    "status": "active"
+  },
+  {
+    "id": "IT-1020",
+    "photo": "https://api.dicebear.com/7.x/avataaars/svg?seed=TechStart",
+    "fullName": "Tech Startups HQ",
+    "coreCompetency": "Office Cabling (CAT6)",
+    "ratings": 4.0,
+    "status": "active"
+  },
+  {
+    "id": "IT-1021",
+    "photo": "https://api.dicebear.com/7.x/avataaars/svg?seed=Apex",
+    "fullName": "Apex Gym",
+    "coreCompetency": "Membership Software Setup",
+    "ratings": 4.6,
+    "status": "active"
+  },
+  {
+    "id": "IT-1022",
+    "photo": "https://api.dicebear.com/7.x/avataaars/svg?seed=Chris",
+    "fullName": "Chris P.",
+    "coreCompetency": "GPU Liquid Cooling Install",
+    "ratings": 4.8,
+    "status": "active"
+  },
+  {
+    "id": "IT-1023",
+    "photo": "https://api.dicebear.com/7.x/avataaars/svg?seed=Skyline",
+    "fullName": "Skyline Realty",
+    "coreCompetency": "Virtual Tour Hosting Setup",
+    "ratings": 4.3,
+    "status": "active"
+  },
+  {
+    "id": "IT-1024",
+    "photo": "https://api.dicebear.com/7.x/avataaars/svg?seed=Elena",
+    "fullName": "Elena G.",
+    "coreCompetency": "Lost Password Recovery",
+    "ratings": 5.0,
+    "status": "active"
+  },
+  {
+    "id": "IT-1025",
+    "photo": "https://api.dicebear.com/7.x/avataaars/svg?seed=BuildIt",
+    "fullName": "Build-It Const.",
+    "coreCompetency": "Active Directory Setup",
+    "ratings": 4.5,
+    "status": "active"
+  },
+  {
+    "id": "IT-1026",
+    "photo": "https://api.dicebear.com/7.x/avataaars/svg?seed=Coffee",
+    "fullName": "Coffee House",
+    "coreCompetency": "Menu Board TV Config",
+    "ratings": 4.2,
+    "status": "active"
+  },
+  {
+    "id": "IT-1027",
+    "photo": "https://api.dicebear.com/7.x/avataaars/svg?seed=Robert",
+    "fullName": "Robert Fox",
+    "coreCompetency": "External Drive Repair",
+    "ratings": 3.9,
+    "status": "active"
+  },
+  {
+    "id": "IT-1028",
+    "photo": "https://api.dicebear.com/7.x/avataaars/svg?seed=Prime",
+    "fullName": "Prime Auto",
+    "coreCompetency": "Diagnostic Software Install",
+    "ratings": 4.7,
+    "status": "active"
+  },
+  {
+    "id": "IT-1029",
+    "photo": "https://api.dicebear.com/7.x/avataaars/svg?seed=Swift",
+    "fullName": "Swift Courier",
+    "coreCompetency": "Warehouse Scanner Setup",
+    "ratings": 4.8,
+    "status": "active"
+  },
+  {
+    "id": "IT-1030",
+    "photo": "https://api.dicebear.com/7.x/avataaars/svg?seed=Boutique",
+    "fullName": "The Boutique",
+    "coreCompetency": "Shopify Theme Customization",
+    "ratings": 4.4,
+    "status": "active"
+  },
+  {
+    "id": "IT-1031",
+    "photo": "https://api.dicebear.com/7.x/avataaars/svg?seed=Mark",
+    "fullName": "Mark Anthony",
+    "coreCompetency": "Blue Screen (BSOD) Fix",
+    "ratings": 4.9,
+    "status": "active"
+  },
+  {
+    "id": "IT-1032",
+    "photo": "https://api.dicebear.com/7.x/avataaars/svg?seed=Pet",
+    "fullName": "Pet Groomers",
+    "coreCompetency": "Online Booking Integration",
+    "ratings": 4.6,
+    "status": "active"
+  },
+  {
+    "id": "IT-1033",
+    "photo": "https://api.dicebear.com/7.x/avataaars/svg?seed=Liza",
+    "fullName": "Liza Soberano",
+    "coreCompetency": "Vlog Camera Firmware Fix",
+    "ratings": 4.1,
+    "status": "active"
+  },
+  {
+    "id": "IT-1034",
+    "photo": "https://api.dicebear.com/7.x/avataaars/svg?seed=Dental",
+    "fullName": "Dental Care",
+    "coreCompetency": "X-Ray Machine Network Link",
+    "ratings": 4.8,
+    "status": "active"
+  },
+  {
+    "id": "IT-1035",
+    "photo": "https://api.dicebear.com/7.x/avataaars/svg?seed=Victor",
+    "fullName": "Victor Magtanggol",
+    "coreCompetency": "RAM Upgrade (32GB)",
+    "ratings": 4.3,
+    "status": "active"
+  },
+  {
+    "id": "IT-1036",
+    "photo": "https://api.dicebear.com/7.x/avataaars/svg?seed=Alpha",
+    "fullName": "Alpha Security",
+    "coreCompetency": "VPN Tunnel Configuration",
+    "ratings": 5.0,
+    "status": "active"
+  },
+  {
+    "id": "IT-1037",
+    "photo": "https://api.dicebear.com/7.x/avataaars/svg?seed=Gamer",
+    "fullName": "Gamer's Lounge",
+    "coreCompetency": "Console Port Cleaning",
+    "ratings": 4.5,
+    "status": "active"
+  },
+  {
+    "id": "IT-1038",
+    "photo": "https://api.dicebear.com/7.x/avataaars/svg?seed=Rose",
+    "fullName": "Rose Pharmacy",
+    "coreCompetency": "Database Sync Fix",
+    "ratings": 4.2,
+    "status": "active"
+  },
+  {
+    "id": "IT-1039",
+    "photo": "https://api.dicebear.com/7.x/avataaars/svg?seed=Parish",
+    "fullName": "Local Parish",
+    "coreCompetency": "Live Stream Audio Config",
+    "ratings": 4.7,
+    "status": "active"
+  },
+  {
+    "id": "IT-1040",
+    "photo": "https://api.dicebear.com/7.x/avataaars/svg?seed=City",
+    "fullName": "City Hall",
+    "coreCompetency": "Pentesting & Security Audit",
+    "ratings": 4.9,
+    "status": "active"
+  }
+]
